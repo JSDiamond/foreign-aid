@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+	<head>
+
+		<style>
+			@import url(http://bost.ocks.org/mike/style.css);
+			#chart {
+			  height: 500px;
+			}
+			.node rect {
+			  cursor: pointer;
+			  fill-opacity: .9;
+			  shape-rendering: crispEdges;
+			}
+			.node text {
+			  pointer-events: none;
+			  font-weight: bold;
+			  font-size: 8px;
+			  text-transform: uppercase;
+			  letter-spacing: 0.06em;
+			  /*text-shadow:
+			   -1px -1px 0 #fff,  
+			    1px -1px 0 #fff,
+			    -1px 1px 0 #fff,
+			     1px 1px 0 #fff;*/
+			}
+			.link {
+			  fill: none;
+			  stroke: #000;
+			  stroke-opacity: .1;
+			}
+			.link:hover {
+			  stroke-opacity: .3;
+			}
+
+		</style>
+
+		<meta charset="utf-8">
+		<title>project</title>
+
+		<link rel="stylesheet" href="graphics/style.css">
+		<script type="text/javascript" src="js/vendor/jquery-1.11.1.min.js"></script>
+		<script type="text/javascript" src="js/vendor/d3-3.4.11.min.js"></script>
+		<script type="text/javascript" src="js/vendor/sankey.js"></script>
+	</head>
+	<body>
+		<div id="viz"></div>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var app = faid('#viz');
+			});
+		</script>
+	</body>
+</html>
