@@ -1,0 +1,30 @@
+@import url(http://bost.ocks.org/mike/style.css);
+#chart {
+  height: 500px;
+}
+.node rect {
+  cursor: pointer;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+.node text {
+  pointer-events: none;
+  font-weight: bold;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  /*text-shadow:
+   -1px -1px 0 #fff,  
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+     1px 1px 0 #fff;*/
+}
+.link {
+  fill: none;
+  stroke: #eee;
+  stroke-opacity: 0.9;
+}
+.link:hover {
+	stroke: #ddd;
+  stroke-opacity: 1;
+}

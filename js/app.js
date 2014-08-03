@@ -1,7 +1,8 @@
 (function(){ "use strict";
 
 	window.faid = function(selector){
-
+		var sectcat = {"Counter-Terrorism":"Peace and Security","Combating Weapons of Mass Destruction (WMD)":"Peace and Security","Stabilization Operations and Security Sector Reform":"Peace and Security","Counter-Narcotics":"Peace and Security","Transnational Crime":"Peace and Security","Conflict Mitigation and Reconciliation":"Peace and Security","Peace and Security - General":"Peace and Security","Rule of Law and Human Rights":"Democracy, Human Rights, and Governance","Good Governance":"Democracy, Human Rights, and Governance","Political Competition and Consensus-Building":"Democracy, Human Rights, and Governance","Civil Society":"Democracy, Human Rights, and Governance","Democracy, Human Rights, and Governance - General":"Democracy, Human Rights, and Governance","HIV/AIDS":"Health","Tuberculosis":"Health","Malaria":"Health","Pandemic Influenza and Other Emerging Threats (PIOET)":"Health","Other Public Health Threats":"Health","Maternal and Child Health":"Health","Family Planning and Reproductive Health":"Health","Water Supply and Sanitation":"Health","Nutrition":"Health","Health - General":"Health","Basic Education":"Education And Social Services","Higher Education":"Education And Social Services","Policies, Regulations, and Systems":"Education And Social Services","Social Services":"Education And Social Services","Social Assistance":"Education And Social Services","Education and Social Services - General":"Education And Social Services","Macroeconomic Foundation for Growth":"Economic Development","Trade and Investment":"Economic Development","Financial Sector":"Economic Development","Infrastructure":"Economic Development","Agriculture":"Economic Development","Private Sector Competitiveness":"Economic Development","Economic Opportunity":"Economic Development","Labor Policies and Markets":"Economic Development","Manufacturing":"Economic Development","Mining and Natural Resources":"Economic Development","Economic Development - General":"Economic Development","Environment":"Environment","Natural Resources and Biodiversity":"Environment","Clean Productive Environment":"Environment","Environment - General":"Environment","Protection, Assistance and Solutions":"Humanitarian Assistance","Disaster Readiness":"Humanitarian Assistance","Migration Management":"Humanitarian Assistance","Humanitarian Assistance - Generall":"Humanitarian Assistance","Direct Administrative Costs":"Program Management","Monitoring and Evaluation":"Program Management","International Contributions":"Multi-sector","Debt Relief":"Multi-sector"};
+		var stops = ["Worldwide", "Bureau for Management (USAID)", "Bureau for Policy, Planning and Learning (USAID)", "International Organizations and Development Institutions (US Treasury) - African Development Bank (AfDB)", "International Organizations and Development Institutions (US Treasury) - African Development Fund (AfDF)", "International Organizations and Development Institutions (US Treasury) - Asian Development Bank (AsDB)", "International Organizations and Development Institutions (US Treasury) - Asian Development Fund (AsDF)", "International Organizations and Development Institutions (US Treasury) - Clean Technology Fund (CTF)", "International Organizations and Development Institutions (US Treasury) - European Bank for Reconstruction & Development (EBRD)", "International Organizations and Development Institutions (US Treasury) - Global Agriculture and Food Security Program (GAFSP)", "International Organizations and Development Institutions (US Treasury) - Global Environment Facility (GEF)", "International Organizations and Development Institutions (US Treasury) - Inter-American Development Bank (IDB and FSO)", "International Organizations and Development Institutions (US Treasury) - Inter-American Investment Corporation (IIC)", "International Organizations and Development Institutions (US Treasury) - International Bank for Reconstruction and Development (IBRD)", "International Organizations and Development Institutions (US Treasury) - International Development Association (IDA)", "International Organizations and Development Institutions (US Treasury) - International Fund for Agricultural Development (IFAD)", "International Organizations and Development Institutions (US Treasury) - Multilateral Investment Fund (MIF)", "International Organizations and Development Institutions (US Treasury) - North American Development Bank (NADBank)", "International Organizations and Development Institutions (US Treasury) - Strategic Climate Funds (SCF)", "Office of Innovation and Development Alliances (USAID)", "U.S. Department of the Treasury - Global", "U.S. Department of the Treasury - Office of Technical Assistance - World-Wide Office", "USAID Administrative Costs", "USAID Democracy, Conflict and Humanitarian Assistance", "USAID Economic Growth, Education and Environment", "USAID Global Health", "USAID Inspector General Operating Expense", "USAID Legislative and Public Affairs (LPA)", "USAID Office of Development Partners", "USAID Operating Expense", "USAID Regional Development Mission-Asia", "USAID West Africa Regional"];
 		var self = window.faid,
 		elmnt = $(selector),
 		hashed = {
@@ -11,24 +12,154 @@
 			hash: window.location.hash.substr(1).split("/")
 		};
 
-		var init = function(){
+		function randomRange(min,max){return Math.floor(Math.random()*(max-min)+min);}
+		function randomColor(){return "rgb("+randomRange(100,200)+","+randomRange(100,200)+","+randomRange(100,200)+")";}
+		function log(output){console.log(output);}
+
+		function init(){
 			updateHash();
 			location.hash = hashed.year+"/"+hashed.d1+"/"+hashed.d2+"/"+encodeURIComponent(hashed.focus);
 			
+			for(var key in categories){
+				var sects = categories[key].sectors.split("|");
+				categories[key].color = randomColor();
+				sects.forEach(function(d){
+					sectcat[d] = key;
+				});
+			}
+
 			getData();
 
-			$(window).on('hashchange', function() {
-				updateHash();
-				hashChanged();
-			});
+			// $(window).on('hashchange', function() {
+			// 	updateHash();
+			// 	hashChanged();
+			// });
 		}
 
 		function getData(){
 			$.getScript("js/data/aid_"+hashed.year+".js", function(data){
 				self.year = hashed.year;
 				self.aid = aid.filter(function(d){ return d[3]>=0 });
-				buildSankeyData(self.aid,hashed.d1,hashed.d2);
+				//buildSankeyData(self.aid,hashed.d1,hashed.d2);
+				buildTreeData(self.aid,1,2);
 			});
+		}
+
+		function buildTreeData(input,dex1,dex2){
+			var sandata = { nodes:[], links: [], lookup:{} };
+			var tree_array = d3.nest()
+				.key(function(d) { return d[dex1]; })
+				.key(function(d) { return d[dex2]; })
+				.rollup(function(leaves) { return d3.sum(leaves, function(d) { return parseFloat(d[3]);}); })
+				.entries(input);
+			
+			var tree_obj = {"name":"tree","children":[]};
+			tree_array.forEach(function(d){
+				if(stops.indexOf(d.key)!=-1) return;
+				var kids = d.values.map(function(child){
+					return {"name":child.key,"size":child.values} 
+				}).sort(function(a,b){return b.size-a.size});
+				tree_obj.children.push({"name":d.key,"children":kids});
+			});
+			log(tree_obj);
+			circlePack(tree_obj);
+			// nested_array.forEach(function(d){
+			// 	var source_val = sandata.lookup[d.key];
+			// 	d.values.forEach(function(child){
+			// 		if(hashed.focus){ if(d.key!=hashed.focus && child.key!=hashed.focus) return }
+			// 		if(stops.indexOf(d.key)!=-1 || stops.indexOf(child.key)!=-1) return;
+			// 		sandata.links.push({"source":source_val,"target":sandata.lookup[child.key],"value":child.values})
+			// 	});
+			// });
+		}
+
+		function circlePack(root){
+			var margin = 20,
+			    diameter = 800;
+
+			var color = d3.scale.linear()
+			    .domain([-1, 5])
+			    .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
+			    .interpolate(d3.interpolateHcl);
+			var radius = 20;
+			var arc = d3.svg.arc()
+			    .outerRadius(radius - 10)
+			    .innerRadius(radius - 70);
+			var pie = d3.layout.pie()
+			    .sort(null)
+			    .value(function(d) { return d.population; });
+			  // var g = svg.selectAll(".arc")
+			  //     .data(pie(data))
+			  //   .enter().append("g")
+			  //     .attr("class", "arc");
+			  //     .append("path")
+			  //     .attr("d", arc)
+			  //     .style("fill", function(d) { return color(d.data.age); });
+
+
+			var pack = d3.layout.pack()
+			    .padding(18)
+			    .sort(function(a,b){return b.value-a.value})
+			    .size([diameter - margin, diameter - margin])
+			    .value(function(d) { return d.size; })
+
+			var svg = d3.select("body").append("svg")
+			    .attr("width", diameter)
+			    .attr("height", diameter)
+			  .append("g")
+			    .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+			  var focus = root,
+			      nodes = pack.nodes(root),
+			      view;
+
+			  var circle = svg.selectAll("circle")
+			      .data(nodes)
+			    .enter().append("circle")
+			      .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+			      .style("fill", function(d) { if(!d.children){d3.select(this).remove(); }; return d.children ? color(d.depth) : null; })
+			      .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+
+			  var text = svg.selectAll("text")
+			      .data(nodes)
+			    .enter().append("text")
+			      .attr("class", "label")
+			      .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
+			      .style("display", function(d) { if(!d.children){d3.select(this).remove()}; return d.parent === root ? null : "none"; })
+			      .text(function(d) { return d.name; });
+
+			  var node = svg.selectAll("circle,text");
+
+			  d3.select("body")
+			      //.style("background", color(-1))
+			      .on("click", function() { zoom(root); });
+
+			  zoomTo([root.x, root.y, root.r * 2 + margin]);
+
+			  function zoom(d) {
+			    var focus0 = focus; focus = d;
+
+			    var transition = d3.transition()
+			        .duration(d3.event.altKey ? 7500 : 750)
+			        .tween("zoom", function(d) {
+			          var i = d3.interpolate(view, [focus.x, focus.y, focus.r * 2 + margin]);
+			          return function(t) { zoomTo(i(t)); };
+			        });
+
+			    transition.selectAll("text")
+			      .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
+			        .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
+			        .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
+			        .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
+			  }
+
+			  function zoomTo(v) {
+			    var k = diameter / v[2]; view = v;
+			    node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
+			    circle.attr("r", function(d) { return d.r * k; });
+			  }
+
+			d3.select(self.frameElement).style("height", diameter + "px");			
 		}
 
 		function updateHash(){
@@ -43,6 +174,7 @@
 			var sandata = { nodes:[], links: [], lookup:{} };
 			input.forEach(function(d,i){
 				if(hashed.focus){ if(d[dex1]!=hashed.focus && d[dex2]!=hashed.focus) return }
+				if(stops.indexOf(d[dex1])!=-1 || stops.indexOf(d[dex2])!=-1) return;
 				if(!sandata.lookup.hasOwnProperty(d[dex1])){
 					sandata.lookup[d[dex1]] = sandata.nodes.length;
 					sandata.nodes.push({"name":d[dex1]});
@@ -72,6 +204,7 @@
 				var source_val = sandata.lookup[d.key];
 				d.values.forEach(function(child){
 					if(hashed.focus){ if(d.key!=hashed.focus && child.key!=hashed.focus) return }
+					if(stops.indexOf(d.key)!=-1 || stops.indexOf(child.key)!=-1) return;
 					sandata.links.push({"source":source_val,"target":sandata.lookup[child.key],"value":child.values})//Math.floor(Math.random()*20)
 				});
 			});
@@ -100,7 +233,7 @@
 
 		  var sankey = d3.sankey()
 		      .nodeWidth(30)
-		      .nodePadding(4)
+		      .nodePadding(10)
 		      .size([width, height]);
 
 		  var path = sankey.link();
@@ -113,7 +246,8 @@
 			    .attr("class", "link")
 			    .attr("d", path)
 			    .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-			    .sort(function(a, b) { return b.dy - a.dy; });
+			    .sort(function(a, b) { return b.dy - a.dy; })
+			    .on("mouseover", function() { this.parentNode.appendChild(this); });
 
 			link.append("title")
 			    .text(function(d) { return d.source.name + " → " + d.target.name + "\n" + format(d.value); });
@@ -132,7 +266,7 @@
 			    .attr("height", function(d) { return d.dy; })
 			    .attr("width", sankey.nodeWidth())
 			    .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
-			    .style("stroke", function(d) { return d3.rgb(d.color).darker(0.2); })
+			    .style("stroke", function(d) { return d.color; })//d3.rgb(d.color).darker(0.2)
 			    .on('click', function(d){focusSankey(d.name);})
 			  .append("title")
 			    .text(function(d) { return d.name + "\n" + format(d.value); });
