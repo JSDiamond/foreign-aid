@@ -81,21 +81,6 @@
 			    .domain([-1, 5])
 			    .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
 			    .interpolate(d3.interpolateHcl);
-			var radius = 20;
-			var arc = d3.svg.arc()
-			    .outerRadius(radius - 10)
-			    .innerRadius(radius - 70);
-			var pie = d3.layout.pie()
-			    .sort(null)
-			    .value(function(d) { return d.population; });
-			  // var g = svg.selectAll(".arc")
-			  //     .data(pie(data))
-			  //   .enter().append("g")
-			  //     .attr("class", "arc");
-			  //     .append("path")
-			  //     .attr("d", arc)
-			  //     .style("fill", function(d) { return color(d.data.age); });
-
 
 			var pack = d3.layout.pack()
 			    .padding(18)
@@ -113,12 +98,27 @@
 			      nodes = pack.nodes(root),
 			      view;
 
-			  var circle = svg.selectAll("circle")
+			  //var circle = [];
+			  var gees = svg.selectAll("g")
 			      .data(nodes)
-			    .enter().append("circle")
-			      .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
-			      .style("fill", function(d) { if(!d.children){d3.select(this).remove(); }; return d.children ? color(d.depth) : null; })
-			      .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+			    .enter().append("g")
+			    .attr("class", function(d) { 
+			      	if( d.parent && d.children){
+			      		renderNode(this,d);
+					}else{
+			     		d3.select(this).remove();
+			     		return;
+			     	}
+			      	return d.parent ? d.children ? "g_node" : "g_node g_node--leaf" : "g_node g_node--root"; 
+			      })
+			   	.on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+
+			  // var circle = svg.selectAll("circle")
+			  //     .data(nodes)
+			  //   .enter().append("circle")
+			  //     .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+			  //     .style("fill", function(d) { if(!d.children){d3.select(this).remove(); }; return d.children ? color(d.depth) : null; })
+			  //     .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
 			  var text = svg.selectAll("text")
 			      .data(nodes)
@@ -127,14 +127,47 @@
 			      .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
 			      .style("display", function(d) { if(!d.children){d3.select(this).remove()}; return d.parent === root ? null : "none"; })
 			      .text(function(d) { return d.name; });
+			  
 
-			  var node = svg.selectAll("circle,text");
+			  //var circle = d3.selectAll('circle');
+			  //var arcs = d3.selectAll('.arc')
+			  var node = svg.selectAll(".g_node"); //.g_node,text
+			  var texts = svg.selectAll("text");
 
 			  d3.select("body")
 			      //.style("background", color(-1))
 			      .on("click", function() { zoom(root); });
 
 			  zoomTo([root.x, root.y, root.r * 2 + margin]);
+
+			  function renderNode(g,d){
+					// d3.select(g).selectAll("circle")
+				 //      .data([d])
+				 //    .enter().append("circle")
+				 //      .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+				 //      .attr("r", 10)
+				 //      .style("fill", function(d) { if(!d.children){d3.select(this).remove(); }; return d.children ? color(d.depth) : null; })
+				 //      .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+				 var test = true;
+					var radius = d.r;
+					var arc = d3.svg.arc()
+					    .outerRadius(d.r)
+					    .innerRadius(d.r - (d.r*0.5));
+					var pie = d3.layout.pie()
+					    //.sort(null)
+					    .value(function(d) { return d.size; });
+
+				   var gg = d3.select(g).selectAll(".arc")
+				      .data(pie(d.children))
+				    .enter().append("g")
+				      .attr("class", "garc");
+
+				  	gg.append("path")
+				      .attr("d", arc)
+				      .attr("class", "arc")
+				      .attr("title", function(d){return d.data.name;})
+				      .style("fill", function(d) {return ( categories.hasOwnProperty(sectcat[d.data.name]) )? categories[sectcat[d.data.name]].color : "black"; });
+			  }
 
 			  function zoom(d) {
 			    var focus0 = focus; focus = d;
@@ -143,20 +176,29 @@
 			        .duration(d3.event.altKey ? 7500 : 750)
 			        .tween("zoom", function(d) {
 			          var i = d3.interpolate(view, [focus.x, focus.y, focus.r * 2 + margin]);
-			          return function(t) { zoomTo(i(t)); };
+			          return function(t) { zoomTo(i(t),focus0, focus); };
 			        });
 
-			    transition.selectAll("text")
-			      .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
-			        .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
-			        .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
-			        .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
+			    // transition.selectAll("text")
+			    //   .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
+			    //     .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
+			    //     .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
+			    //     .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
 			  }
 
-			  function zoomTo(v) {
+			  function zoomTo(v,focus0,focus) {
 			    var k = diameter / v[2]; view = v;
-			    node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
-			    circle.attr("r", function(d) { return d.r * k; });
+			    node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ") scale("+(k)+")"; });
+			    texts.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ") scale("+(k)+")"; });
+			    //circle.attr("r", function(d) { return d.r * k; });
+
+			    // gees.attr("title", function(d){ 
+			    // 	//if(focus!=d && focus0!=d){return;}
+			    // 	var radius = d.r * k;
+			    // 	var arc = d3.svg.arc().outerRadius(radius).innerRadius(radius - (radius*0.5));
+			    // 	d3.select(this).selectAll('.arc').attr("d", arc)
+			    // 	return "";
+			    // });
 			  }
 
 			d3.select(self.frameElement).style("height", diameter + "px");			
