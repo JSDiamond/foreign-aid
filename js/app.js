@@ -13,7 +13,7 @@
 		};
 
 		function randomRange(min,max){return Math.floor(Math.random()*(max-min)+min);}
-		function randomColor(){return "rgb("+randomRange(100,200)+","+randomRange(100,200)+","+randomRange(100,200)+")";}
+		function randomColor(){return "rgb("+randomRange(20,50)+","+randomRange(100,180)+","+randomRange(230,180)+")";}
 		function log(output){console.log(output);}
 
 		function init(){
@@ -74,8 +74,11 @@
 		}
 
 		function circlePack(root){
-			var margin = 20,
-			    diameter = 800;
+			var margin = 2;
+			self.width = $(window).width();
+			self.height = $(window).height();
+			self.nodez = [];
+			var diameter = Math.min.apply(null, [self.width,self.height]);
 
 			var color = d3.scale.linear()
 			    .domain([-1, 5])
@@ -83,12 +86,12 @@
 			    .interpolate(d3.interpolateHcl);
 
 			var pack = d3.layout.pack()
-			    .padding(18)
+			    .padding(10)
 			    .sort(function(a,b){return b.value-a.value})
 			    .size([diameter - margin, diameter - margin])
 			    .value(function(d) { return d.size; })
 
-			var svg = d3.select("body").append("svg")
+			var svg = d3.select("#viz").append("svg")
 			    .attr("width", diameter)
 			    .attr("height", diameter)
 			  .append("g")
@@ -111,7 +114,7 @@
 			     	}
 			      	return d.parent ? d.children ? "g_node" : "g_node g_node--leaf" : "g_node g_node--root"; 
 			      })
-			   	.on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+			   	.on("click", function(d) { if (focus !== d) zoom(d,diameter), d3.event.stopPropagation(); });
 
 			  // var circle = svg.selectAll("circle")
 			  //     .data(nodes)
@@ -136,10 +139,13 @@
 
 			  d3.select("body")
 			      //.style("background", color(-1))
-			      .on("click", function() { zoom(root); });
+			      .on("click", function() { zoom(root,diameter); });
 
 			  zoomTo([root.x, root.y, root.r * 2 + margin]);
-
+			  //log(gees[0][1])
+			  setTimeout(function(){zoom(gees[0][1].__data__,20)}, 1111)
+			  setTimeout(function(){zoom(self.nodez[1],20)}, 2222)
+			  setTimeout(function(){zoom(self.nodez[2],20)}, 3333)
 			  function renderNode(g,d){
 					// d3.select(g).selectAll("circle")
 				 //      .data([d])
@@ -148,11 +154,10 @@
 				 //      .attr("r", 10)
 				 //      .style("fill", function(d) { if(!d.children){d3.select(this).remove(); }; return d.children ? color(d.depth) : null; })
 				 //      .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
-				 var test = true;
 					var radius = d.r;
 					var arc = d3.svg.arc()
-					    .outerRadius(d.r)
-					    .innerRadius(d.r - (d.r*0.5));
+					    .outerRadius( (d.r<=2)? 2 : d.r )
+					    .innerRadius( (d.r<=2)? 0.6  : (d.r - d.r*0.3)-1 );
 					var pie = d3.layout.pie()
 					    //.sort(null)
 					    .value(function(d) { return d.size; });
@@ -167,15 +172,17 @@
 				      .attr("class", "arc")
 				      .attr("title", function(d){return d.data.name;})
 				      .style("fill", function(d) {return ( categories.hasOwnProperty(sectcat[d.data.name]) )? categories[sectcat[d.data.name]].color : "black"; });
+
+				    self.nodez.push(d); 
 			  }
 
-			  function zoom(d) {
+			  function zoom(d,diam) {
 			    var focus0 = focus; focus = d;
-
+			    var margin = (d.r<=2)? 10 : (d.r>=diam*0.1)? 0 : d.r;
 			    var transition = d3.transition()
-			        .duration(d3.event.altKey ? 7500 : 750)
-			        .tween("zoom", function(d) {
-			          var i = d3.interpolate(view, [focus.x, focus.y, focus.r * 2 + margin]);
+			        .duration(750) //d3.event.hasOwnProperty("altKey") ? 7500 :
+			        .tween("zoom", function() {
+			          var i = d3.interpolate(view, [focus.x, focus.y, focus.r * 2 + (margin*0.5)]);
 			          return function(t) { zoomTo(i(t),focus0, focus); };
 			        });
 
@@ -189,7 +196,7 @@
 			  function zoomTo(v,focus0,focus) {
 			    var k = diameter / v[2]; view = v;
 			    node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ") scale("+(k)+")"; });
-			    texts.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ") scale("+(k)+")"; });
+			    texts.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ") scale("+(zoomScale(k))+")"; });
 			    //circle.attr("r", function(d) { return d.r * k; });
 
 			    // gees.attr("title", function(d){ 
@@ -203,6 +210,8 @@
 
 			d3.select(self.frameElement).style("height", diameter + "px");			
 		}
+
+		var zoomScale = d3.scale.linear().domain([1, 10, 200]).range([1, 4, 0.4]);
 
 		function updateHash(){
 			hashed.hash = window.location.hash.substr(1).split("/");
