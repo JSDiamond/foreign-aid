@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+	<head>
+
+		<meta charset="utf-8">
+		<title>project</title>
+
+		<link rel="stylesheet" href="graphics/style.css">
+
+		<style>
+			svg{
+				position: relative;
+				margin: 0 auto;
+			}
+			.varea{
+				fill: coral;
+				fill-opacity: 0.2;
+			}
+			.varea:hover{
+				fill-opacity: 0.4;
+			}
+		</style>
+
+		<script type="text/javascript" src="js/vendor/jquery-1.11.1.min.js"></script>
+		<script type="text/javascript" src="js/vendor/d3-3.4.11.min.js"></script>
+		<script type="text/javascript" src="js/vendor/sankey.js"></script>
+	</head>
+	<body>
+		<div id="viz"></div>
+		<script src="js/varea.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var app = varea('#viz');
+			});
+		</script>
+	</body>
+</html>
