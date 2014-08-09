@@ -14,7 +14,7 @@
 		};
 
 		function randomRange(min,max){return Math.floor(Math.random()*(max-min)+min);}
-		function randomColor(){return "rgb("+randomRange(20,50)+","+randomRange(100,180)+","+randomRange(230,180)+")";}
+		function randomColor(){return "rgb("+randomRange(180,240)+","+randomRange(180,240)+","+randomRange(180,240)+")";}
 		function log(output){console.log(output);}
 
 		function init(){
@@ -54,9 +54,11 @@
 			setSize();
 			self.wst = $(window).scrollTop();
 			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*1.5)]);//-(self.tree_obj.children.length*self.opad)
-			//var scrollorigin = (self.height*0.6)*2+(self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length));
-			var scrollmadness = self.tree_obj.size*0.00001;
-			d3.select("#scrollspace").style("height", scrollmadness+"px");
+			//var scrollorigin = (self.height*0.7)*2+(self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length));
+			//var scrollmadness = self.tree_obj.size*0.00001;
+			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.08)+(self.opad*self.tree_obj.children.length);
+			self.scrollScale = d3.scale.linear().domain([0, scrollsize]).range([0, self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length)]);
+			d3.select("#scrollspace").style("height", scrollsize+"px");
 
 			if(self.svg){
 				self.svg.attr("width", self.width).attr("height", self.height);
@@ -114,7 +116,7 @@
 			self.nodez = [];
 
 			self.startScale = d3.scale.linear().domain([0, 100]).range([0, 8]);
-			self.endScale = d3.scale.linear().domain([0, 100]).range([0, 100]);
+			self.endScale = d3.scale.linear().domain([0, 100]).range([2, 100]);
 			var line = d3.svg.line()
 				.defined(function(d) { return String(d.y) != 'NaN'; })
 				.x(function(d) {return d.x;})
@@ -155,17 +157,17 @@
 				.attr("y",0);
 
 			self.pad = [20, 0];
-			var prevY1 = 0, prevY0 = 0;
-			var values = self.gees[0][0].__data__.children.map(function(d){ return d.size });
-			log(values.reduce(function(a,b){return a+b;}));
-			var vareaData = vareaStack(values,self.pad,prevY1,prevY0);
-			self.varea = d3.select(self.gees[0][0]).selectAll("varea").data(vareaData).enter().append("path")
-				.attr("class", 'varea')
-				.attr("d", self.area)
-				.attr("fill", "coral");//url(#linkgrad)
+			self.valueGroup = [];
+			self.vareaGroup = [];
+			self.drectGroup = [];
+			self.originFocus = 1;
+			bindVarea(0);
+			// bindVarea(3);
+			// bindVarea(5);
+			// bindVarea(10);
+			// bindVarea(100);
 
 			positionStacks();
-
 			  // self.nodez = sortKey(self.nodez,['__data__','value']);
 			  // var node = self.svg.selectAll(".g_node"); //.g_node,text
 			function renderNode(g,_d){
@@ -202,24 +204,61 @@
 				positionStacks();
 				// prevY0 = wst*-1;
 				// prevY1 = 220 + wst*-0.04;
-				// var newData = vareaStack(values,pad,prevY1,prevY0);
+				// var newData = vareaStack(values,pad,prevY1,prevY0); 
 				// vstack.data(newData).attr("d", area);
 			});
 		}
 
 		function positionStacks(){
 			self.gees.attr("transform", function(d,i){
-				var yoffset = self.height*0.4+self.originScale(d.stack)+(i*self.opad)-(self.wst*0.02);
+				//var yoffset = self.height*0.4+self.originScale(d.stack)+(i*self.opad)-(self.wst*0.04);
+				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.scrollScale(self.wst)*-1//-(self.wst*0.04);
+				d.yoffset = yoffset;
 				return "translate("+self.ox+","+yoffset+")";
 			});
 			self.orects.attr("width", self.rectW)
-			.attr("height",function(d,i){ return self.originScale(d.size); });
-			//prevY1 = self.wst*-0.04;
-			var values = self.gees[0][0].__data__.children.map(function(d){ return d.size });
-			var newData = vareaStack(values,self.pad,0,(self.wst*-0.08));
-			self.varea.data(newData).attr("d", self.area);
+				.attr("height",function(d,i){ return self.originScale(d.size); });
+
+			//log( self.scrollScale( self.gees[0][0].__data__.yoffset ) );
+
+			self.valueGroup.forEach(function(d,i){
+				var yoff = self.gees[0][i].__data__.yoffset;
+				var newData = vareaStack(d,self.pad,0, 0 ); //(self.wst*-0.4+(yoff*10))
+				self.vareaGroup[i].data(newData.links).attr("d", self.area);
+				self.drectGroup[i].data(newData.drects).attr("x", function(d){return d.x})
+					.attr("y", function(d){return d.y1})
+					.attr("width", self.rectW)
+					.attr("height", function(d){return d.y0});
+			});
+
+			// var first = [newData.links[0][0].y1, newData.links[0][3].y1];
+			// var last = [newData.links[newData.links.length-1][0].y1, newData.links[newData.links.length-1][3].y1];
+			// if(last[1]<=last[0]-40)console.log("self.originFocus + 1");
+			// if(first[1]>=first[0]+40)console.log("self.originFocus - 1");
 		}
 
+		function bindVarea(n){
+			var prevY1 = 0, prevY0 = 0;
+			self.values = self.gees[0][n].__data__.children.map(function(d){ return {name:d.name, val:d.size}; });
+			//log(self.values.reduce(function(a,b){return a+b;}));
+			var vareaData = vareaStack(self.values,self.pad,prevY1,prevY0);
+			self.varea = d3.select(self.gees[0][n]).selectAll("varea").data(vareaData.links).enter().append("path")
+				.attr("class", 'varea')
+				.attr("d", self.area)
+				.attr("fill", function(d){ return d[0].clr });//url(#linkgrad)
+
+			self.drects = d3.select(self.gees[0][n]).selectAll("Drect").data(vareaData.drects).enter().append("rect")
+				.attr("class", 'drect')
+				.attr("x", function(d){return d.x})
+				.attr("y", function(d){return d.y1})
+				.attr("width", self.rectW)
+				.attr("height", function(d){return d.y0})
+				//.attr("stroke", function(d){ return d.clr })
+				.attr("fill", function(d){ return d.clr });//url(#linkgrad)
+			self.valueGroup.push(self.values);
+			self.vareaGroup.push(self.varea);
+			self.drectGroup.push(self.drects);
+		}
 
 		function vareaDimens(_a, _pad, _p1, _p0){
 				//_a.sort(function(a,b){return b-a});
@@ -238,30 +277,32 @@
 				ph1-=_pad[1];
 
 				return {0:{start:_p0, end:ph0, height:Math.ceil(ph0-_p0)}, 1:{start:_p1, end:ph1, height:Math.ceil(ph1-_p1)}};
-			}
+		}
 
 
 		function vareaStack(_a, _pad, _p1, _p0){
 			//_a.sort(function(a,b){return b-a});
-			self.startScale.domain([0, d3.max(_a)]);//d3.min(_a)
-			self.endScale.domain([0, d3.max(_a)]);
-
+			//self.startScale.domain([0, d3.max(_a)]);//d3.min(_a)
+			self.endScale.domain([0, d3.max(_a.map(function(d){return d.val;}))]); d3.max(_a);
+			var rectD = []
 			var _astack = _a.map(function(d,i){ 
 				var startone = _p1,
-				startzero = self.originScale(d)+_p1,
+				startzero = self.originScale(d.val)+_p1,
 				endone = _p0,
-				endzero = self.endScale(d)+_p0,
+				endzero = self.endScale(d.val)+_p0,
+				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : "black",
 				dat = [
-					{x: self.rectW, y1: startone, y0: startzero}, 
+					{x: self.rectW, y1: startone, y0: startzero, clr: color, name:d.name}, 
 					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
 					{x: self.width-self.dx-self.rectW-self.innerbend, y1: endone, y0: endzero}, 
 					{x: self.width-self.dx-self.rectW, y1: endone, y0: endzero}
 				];
-				_p1 = startzero+_pad[1];
+				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color, name:d.name});
+				_p1 = startzero+_pad[1]-2;
 				_p0 = endzero+_pad[0];
 				return dat;
 			});
-			return _astack;
+			return {links:_astack, drects:rectD};
 		}
 
 		function updateHash(){
