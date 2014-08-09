@@ -1,58 +1,21 @@
 <!doctype html>
 <html lang="en">
 	<head>
+
 		<meta charset="utf-8">
 		<title>project</title>
 
 		<link rel="stylesheet" href="graphics/style.css">
-		<link rel="stylesheet" href="graphics/sankey.css">
-		<style>
 
-.node {
-  cursor: pointer;
-}
-
-.node:hover {
-  stroke: #000;
-  stroke-width: 1.5px;
-}
-
-.node--leaf {
-  fill: white;
-  fill-opacity: 0.1;
-}
-
-.label {
-position: absolute;
-  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-anchor: middle;
-  fill: #999;
-  /*display: none;*/
-  /*text-shadow: 0 1px 0 #111, 1px 0 0 #111, -1px 0 0 #111, 0 -1px 0 #111;*/
-}
-
-.label,
-.node--root,
-.node--leaf {
-  pointer-events: none;
-}
-
-.arc{
-	stroke: #fff;
-	stroke-width: 0.1px;
-	fill:coral;
-	-webkit-transition: opacity 0.2s;
-}
-.arc.blurred{
-	opacity: 0.2;
-}
-</style>
 		<script type="text/javascript" src="js/vendor/jquery-1.11.1.min.js"></script>
 		<script type="text/javascript" src="js/vendor/d3-3.4.11.min.js"></script>
-		<script type="text/javascript" src="js/vendor/sankey.js"></script>
+
 	</head>
 	<body>
+
 		<div id="viz"></div>
+		<div id="scrollspace"></div>
+		
 		<script src="js/data/categories.js"></script>
 		<script src="js/data/sectors.js"></script>
 		<script src="js/app.js"></script>
@@ -61,5 +24,6 @@ position: absolute;
 				var app = faid('#viz');
 			});
 		</script>
+
 	</body>
 </html>
