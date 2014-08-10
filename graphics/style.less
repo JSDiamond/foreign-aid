@@ -10,25 +10,42 @@ html,body{}
 	height: 400px;
 	background-color: #eee;
 }
-#scrollspace{
-	width:200px;
-}
 .orect{
-	fill-opacity: 0.2;
+	fill: #888;
+	fill-opacity: 0.5;
+}
+.drect{
+	fill-opacity: 1;
 }
 .varea{
-	fill-opacity: 0.5;
+	fill-opacity: 0.4;
 	&:hover{
-		fill-opacity: 0.8;	
+		fill-opacity: 1;	
 	}
 }
 .g_node{
 	&.blurred{
-		.varea{
-			fill-opacity: 0.2;
-		}
-		.drect{
-			fill-opacity: 0.3;
+		opacity: 0.3;
+		// .varea{
+		// 	fill-opacity: 0.2;
+		// }
+		// .drect{
+		// 	fill-opacity: 0.3;
+		// }
+		.ovlabel{
+			display: none;
 		}
 	}
+}
+.olabel{
+	fill: #333;
+	font: 300 10px/14px "Arial";
+}
+.ovlabel{
+	fill: #333;
+	font: 300 10px/14px "Arial";
+}
+.dlabel{
+	fill: #333;
+	font: 300 14px/18px "Arial";
 }

@@ -24,7 +24,7 @@
 			//assign colors and and sectors to categories
 			for(var key in categories){
 				var sects = categories[key].sectors.split("|");
-				categories[key].color = randomColor();
+				categories[key].color = d3.rgb(randomColor());
 				sects.forEach(function(d){
 					sectcat[d] = key;
 				});
@@ -36,6 +36,14 @@
 			// 	updateHash();
 			// 	hashChanged();
 			// });
+		}
+
+		function getData(){
+			$.getScript("js/data/aid_"+hashed.year+".js", function(data){
+				self.year = hashed.year;
+				self.aid = aid.filter(function(d){ return d[3]>=0 });
+				buildTreeData(self.aid,1,2);
+			});
 		}
 
 		function setSize(){
@@ -74,14 +82,6 @@
 					positionStacks(self.headroom.top);
 				}
 			}
-		}
-
-		function getData(){
-			$.getScript("js/data/aid_"+hashed.year+".js", function(data){
-				self.year = hashed.year;
-				self.aid = aid.filter(function(d){ return d[3]>=0 });
-				buildTreeData(self.aid,1,2);
-			});
 		}
 
 		function buildTreeData(input,dex1,dex2){
@@ -161,15 +161,25 @@
 			self.orects = self.gees.append("rect")
 				.attr("class", "orect")
 				.attr("width",self.rectW)
-				.attr("height",function(d,i){ return self.originScale(d.size); })
+				.attr("height",function(d){return self.originScale(d.size);})
 				.attr("x",0)
 				.attr("y",0);
+			self.olabels = self.gees.append("text")
+				.attr("class", "olabel")
+				.attr("x",function(d){return d.name.length*-6})
+				.attr("y",function(d){return self.originScale(d.size)*0.5;})
+				.text(function(d){return d.name});
+			self.ovlabels = self.gees.append("text")
+				.attr("class", "ovlabel")
+				.attr("x",4)
+				.attr("y",function(d){return self.originScale(d.size)*0.5;})
+				.text(function(d){return "$"+Math.floor(d.size*0.000001)+"M" });
 
 			self.pad = [20, 0];
 			self.focusGroup = {
 				value:[],
 				varea:[],
-				drect:[],
+				dgs:[],
 				gs:[],
 				gn:[]
 			}
@@ -211,15 +221,13 @@
 
 			self.focusGroup.value.forEach(function(d,i){
 				var bcr = d3.select(self.focusGroup.gs[i]).select(".orect")[0][0].getBoundingClientRect();
-				//var paralax = (bcr.top-self.winHalf)*10;
 				var vH = vareaDimens(d,self.pad,0,0)[0].height;
 				self.paralaxScale.domain([0,bcr.height]).range([0,vH]);
 				var newData = vareaStack(d,self.pad,0, self.paralaxScale(self.winHalf-bcr.top)*-1 ); //(wst*-0.4+(yoff*10))
 				self.focusGroup.varea[i].data(newData.links).attr("d", self.area);
-				self.focusGroup.drect[i].data(newData.drects).attr("x", function(d){return d.x})
-					.attr("y", function(d){return d.y1})
-					.attr("width", self.rectW)
-					.attr("height", function(d){return d.y0});
+				self.focusGroup.dgs[i].data(newData.drects).attr("transform", function(d,i){
+					return "translate("+d.x+","+d.y1+")";
+				});
 			});
 
 			self.gees[0].forEach(function(d,i){
@@ -230,9 +238,6 @@
 					if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
 				} else {
 					if(i==self.focusGroup.gn[0]){removeVarea(i);}
-					// removeVarea(i); 
-					// removeVarea(i-1);
-					// removeVarea(i+1);
 				}
 			});
 		}
@@ -247,17 +252,29 @@
 				.attr("d", self.area)
 				.attr("fill", function(d){ return d[0].clr });//url(#linkgrad)
 
-			self.drects = d3.select(self.gees[0][n]).selectAll("Drect").data(vareaData.drects).enter().append("rect")
+			self.dgs = d3.select(self.gees[0][n]).selectAll("dg")
+				.data(vareaData.drects).enter()
+				.append("g").attr("class", "dg")
+				.attr("transform", function(d){return "translate("+d.x+","+d.y1+")";});
+
+			self.drects = self.dgs.append("rect")
 				.attr("class", 'drect')
-				.attr("x", function(d){return d.x})
-				.attr("y", function(d){return d.y1})
+				.attr("x", 0)//function(d){return d.x})
+				.attr("y", 0)//function(d){return d.y1})
 				.attr("width", self.rectW)
 				.attr("height", function(d){return d.y0})
 				//.attr("stroke", function(d){ return d.clr })
 				.attr("fill", function(d){ return d.clr });//url(#linkgrad)
+
+			self.dgs.append("text")
+				.attr("class", 'dlabel')
+				.attr("x", self.rectW)
+				.attr("y", function(d){return d.y0*0.5})
+				.text(function(d){return d.name})			
+
 			self.focusGroup.value.push(self.values);
 			self.focusGroup.varea.push(self.varea);
-			self.focusGroup.drect.push(self.drects);
+			self.focusGroup.dgs.push(self.dgs);
 			self.focusGroup.gs.push(self.gees[0][n]);
 			self.focusGroup.gn.push(n);
 			positionStacks(self.wst);
@@ -267,11 +284,11 @@
 			var index = self.focusGroup.gn.indexOf(n);
 			if(index == -1) return;
 			self.focusGroup.varea[index].remove();
-			self.focusGroup.drect[index].remove();
+			self.focusGroup.dgs[index].remove();
 
 			self.focusGroup.value.splice(index,1);
 			self.focusGroup.varea.splice(index,1);
-			self.focusGroup.drect.splice(index,1);
+			self.focusGroup.dgs.splice(index,1);
 			self.focusGroup.gs.splice(index,1);
 			self.focusGroup.gn.splice(index,1);
 		}
@@ -286,14 +303,14 @@
 				startzero = self.originScale(d.val)+_p1,
 				endone = _p0,
 				endzero = self.endScale(d.val)+_p0,
-				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : "black",
+				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : d3.rgb("rgb(0,0,0)"),
 				dat = [
-					{x: self.rectW, y1: startone, y0: startzero, clr: color, name:d.name}, 
+					{x: self.rectW, y1: startone, y0: startzero, clr: color.brighter(0.1).toString() , name:d.name}, 
 					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
 					{x: self.width-self.dx-self.rectW-self.innerbend, y1: endone, y0: endzero}, 
 					{x: self.width-self.dx-self.rectW, y1: endone, y0: endzero}
 				];
-				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color, name:d.name});
+				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color.darker(0.1).toString(), name:d.name});
 				_p1 = startzero+_pad[1]-2;
 				_p0 = endzero+_pad[0];
 				return dat;
