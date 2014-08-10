@@ -55,9 +55,9 @@
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*1.5)]);//-(self.tree_obj.children.length*self.opad)
-			
-			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.04)+(self.opad*self.tree_obj.children.length-1);
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*1.75)]);//-(self.tree_obj.children.length*self.opad)
+
+			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.07)+(self.opad*self.tree_obj.children.length-1);
 			self.height = scrollsize;
 			self.oy = self.height*0.004;
 
@@ -125,6 +125,7 @@
 
 			self.startScale = d3.scale.linear().domain([0, 100]).range([0, 8]);
 			self.endScale = d3.scale.linear().domain([0, 100]).range([2, 100]);
+			self.paralaxScale = d3.scale.linear().domain([0, 100]).range([0, 100]);
 			var line = d3.svg.line()
 				.defined(function(d) { return String(d.y) != 'NaN'; })
 				.x(function(d) {return d.x;})
@@ -207,9 +208,11 @@
 			});
 
 			self.focusGroup.value.forEach(function(d,i){
-				//var yoff = self.focusGroup.gs[i].__data__.yoffset;
-				var topoff = self.focusGroup.gs[i].getBoundingClientRect().top+wst;
-				var newData = vareaStack(d,self.pad,0, 0 ); //(wst*-0.4+(yoff*10))
+				var bcr = d3.select(self.focusGroup.gs[i]).select(".orect")[0][0].getBoundingClientRect();
+				//var paralax = (bcr.top-self.winHalf)*10;
+				var vH = vareaDimens(d,self.pad,0,0)[0].height;
+				self.paralaxScale.domain([0,bcr.height]).range([0,vH]);
+				var newData = vareaStack(d,self.pad,0, self.paralaxScale(self.winHalf-bcr.top)*-1 ); //(wst*-0.4+(yoff*10))
 				self.focusGroup.varea[i].data(newData.links).attr("d", self.area);
 				self.focusGroup.drect[i].data(newData.drects).attr("x", function(d){return d.x})
 					.attr("y", function(d){return d.y1})
@@ -219,18 +222,12 @@
 
 			self.gees[0].forEach(function(d,i){
 				var bcr = d3.select(self.gees[0][i]).select(".orect")[0][0].getBoundingClientRect();
-				var sctop =  bcr.top;
-				if(sctop <= self.winHalf && (sctop+bcr.height) >= self.winHalf){
+				if(bcr.top <= self.winHalf && (bcr.top+bcr.height) >= self.winHalf){
 					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i);
 				} else {
 					removeVarea(i);
 				}
 			});
-
-			// var first = [newData.links[0][0].y1, newData.links[0][3].y1];
-			// var last = [newData.links[newData.links.length-1][0].y1, newData.links[newData.links.length-1][3].y1];
-			// if(last[1]<=last[0]-40)console.log("self.originFocus + 1");
-			// if(first[1]>=first[0]+40)console.log("self.originFocus - 1");
 		}
 
 		function bindVarea(n){
@@ -298,14 +295,14 @@
 
 		function vareaDimens(_a, _pad, _p1, _p0){
 				//_a.sort(function(a,b){return b-a});
-				self.startScale.domain([0, d3.max(_a)]);
-				self.endScale.domain([0, d3.max(_a)]);
+				//self.startScale.domain([0, d3.max(_a)]);
+				self.endScale.domain([0, d3.max(_a.map(function(d){return d.val;}))]); d3.max(_a);
 				
 				var stackH1 = 0, stackH0 = 0, ph1 = _p1, ph0 = _p0;
 				_a.forEach(function(d){
-					stackH1 = self.startScale(d)+ph1+_pad[1];
+					stackH1 = self.originScale(d.val)+ph1+_pad[1];
 					ph1 = stackH1;
-					stackH0 = self.endScale(d)+ph0+_pad[0];
+					stackH0 = self.endScale(d.val)+ph0+_pad[0];
 					ph0 = stackH0;
 					//console.log( Math.abs(ph1-ph0) ); //close to being straight?
 				});
