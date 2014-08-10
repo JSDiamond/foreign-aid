@@ -14,7 +14,7 @@
 		};
 
 		function randomRange(min,max){return Math.floor(Math.random()*(max-min)+min);}
-		function randomColor(){return "rgb("+randomRange(180,240)+","+randomRange(180,240)+","+randomRange(180,240)+")";}
+		function randomColor(){return "rgb("+randomRange(140,240)+","+randomRange(140,240)+","+randomRange(140,240)+")";}
 		function log(output){console.log(output);}
 
 		function init(){
@@ -47,7 +47,7 @@
 			//self.winSpan = [self.height*0.4, self.height-self.height*0.4];
 			self.winHalf = self.height*0.5;
 			self.ox = self.width*0.3;
-			self.dx = self.width*0.5;
+			self.dx = self.width*0.6;
 			self.rectW = self.width*0.06;
 			self.innerbend = self.width*0.08;
 			self.opad = 4; 
@@ -55,7 +55,7 @@
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*1.75)]);//-(self.tree_obj.children.length*self.opad)
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2)]);//-(self.tree_obj.children.length*self.opad)
 
 			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.07)+(self.opad*self.tree_obj.children.length-1);
 			self.height = scrollsize;
@@ -201,9 +201,11 @@
 		}
 
 		function positionStacks(wst){
-			self.gees.attr("transform", function(d,i,e){
+			self.gees.attr("transform", function(d,i){
 				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.scrollScale(wst);
 				d.yoffset = yoffset;
+				if(i!=self.focusGroup.gn[0]){ d3.select(self.gees[0][i]).classed("blurred",true);
+				}else{d3.select(self.gees[0][i]).classed("blurred",false);}
 				return "translate("+self.ox+","+yoffset+")";
 			});
 
@@ -222,10 +224,15 @@
 
 			self.gees[0].forEach(function(d,i){
 				var bcr = d3.select(self.gees[0][i]).select(".orect")[0][0].getBoundingClientRect();
-				if(bcr.top <= self.winHalf && (bcr.top+bcr.height) >= self.winHalf){
+				if(bcr.top-self.opad*0.5 <= self.winHalf && (bcr.top+bcr.height+self.opad*0.5) >= self.winHalf){
 					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i);
+					if(self.focusGroup.gn.indexOf(i-1)==-1 && self.gees[0][i-1]) bindVarea(i-1);
+					if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
 				} else {
-					removeVarea(i);
+					if(i==self.focusGroup.gn[0]){removeVarea(i);}
+					// removeVarea(i); 
+					// removeVarea(i-1);
+					// removeVarea(i+1);
 				}
 			});
 		}
@@ -253,6 +260,7 @@
 			self.focusGroup.drect.push(self.drects);
 			self.focusGroup.gs.push(self.gees[0][n]);
 			self.focusGroup.gn.push(n);
+			positionStacks(self.wst);
 		}
 
 		function removeVarea(n){
@@ -278,7 +286,7 @@
 				startzero = self.originScale(d.val)+_p1,
 				endone = _p0,
 				endzero = self.endScale(d.val)+_p0,
-				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : "white",
+				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : "black",
 				dat = [
 					{x: self.rectW, y1: startone, y0: startzero, clr: color, name:d.name}, 
 					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
