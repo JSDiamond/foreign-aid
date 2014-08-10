@@ -31,7 +31,7 @@
 			}
 			setSize();
 			getData();
-
+			//$(window).scrollTop(0, 0);
 			// $(window).on('hashchange', function() {
 			// 	updateHash();
 			// 	hashChanged();
@@ -44,7 +44,9 @@
 			self.margin = 2; self.wst = $(window).scrollTop();
 			self.width = $(window).width();
 			self.height = $(window).height();
-			self.ox = self.width*0.1;
+			//self.winSpan = [self.height*0.4, self.height-self.height*0.4];
+			self.winHalf = self.height*0.5;
+			self.ox = self.width*0.3;
 			self.dx = self.width*0.5;
 			self.rectW = self.width*0.06;
 			self.innerbend = self.width*0.08;
@@ -54,17 +56,23 @@
 			setSize();
 			self.wst = $(window).scrollTop();
 			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*1.5)]);//-(self.tree_obj.children.length*self.opad)
-			//var scrollorigin = (self.height*0.7)*2+(self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length));
-			//var scrollmadness = self.tree_obj.size*0.00001;
-			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.08)+(self.opad*self.tree_obj.children.length);
-			self.scrollScale = d3.scale.linear().domain([0, scrollsize]).range([0, self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length)]);
-			d3.select("#scrollspace").style("height", scrollsize+"px");
+			
+			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.04)+(self.opad*self.tree_obj.children.length-1);
+			self.height = scrollsize;
+			self.oy = self.height*0.004;
+
+			d3.select(selector).style("height", self.height+"px");
+			self.headroom = {top:elmnt.offset().top, bottom:elmnt.outerHeight()}
+			self.oheight = self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length-1);
+			self.scrollScale = d3.scale.linear().domain([self.headroom.top, $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
 
 			if(self.svg){
 				self.svg.attr("width", self.width).attr("height", self.height);
-
-				self.wst = $(window).scrollTop();
-				positionStacks();
+				if(self.wst>self.headroom.top){
+					positionStacks(self.wst);
+				} else {
+					positionStacks(self.headroom.top);
+				}
 			}
 		}
 
@@ -152,56 +160,38 @@
 			self.orects = self.gees.append("rect")
 				.attr("class", "orect")
 				.attr("width",self.rectW)
-				.attr("height",0)
+				.attr("height",function(d,i){ return self.originScale(d.size); })
 				.attr("x",0)
 				.attr("y",0);
 
 			self.pad = [20, 0];
-			self.valueGroup = [];
-			self.vareaGroup = [];
-			self.drectGroup = [];
-			self.originFocus = 1;
-			bindVarea(0);
+			self.focusGroup = {
+				value:[],
+				varea:[],
+				drect:[],
+				gs:[],
+				gn:[]
+			}
+			// bindVarea(0);
+			// bindVarea(1);
+			// bindVarea(2);
 			// bindVarea(3);
+			// bindVarea(4);
 			// bindVarea(5);
-			// bindVarea(10);
 			// bindVarea(100);
 
-			positionStacks();
+			positionStacks(self.headroom.top);
 			  // self.nodez = sortKey(self.nodez,['__data__','value']);
 			  // var node = self.svg.selectAll(".g_node"); //.g_node,text
-			function renderNode(g,_d){
-				var radius = _d.r;
-				var arc = d3.svg.arc()
-				    .outerRadius( (_d.r<=2)? 2 : _d.r )
-				    .innerRadius( (_d.r<=2)? 0.6  : (_d.r - _d.r*0.3)-1 );
-				var pie = d3.layout.pie()
-				    //.sort(null)
-				    .value(function(d) { return d.size; });
-
-			   var gg = d3.select(g).selectAll(".arc")
-			      .data(pie(_d.children))
-			    .enter().append("g")
-			      .attr("class", "garc");
-
-			  	gg.append("path")
-			      .attr("d", arc)
-			      .attr("class", "arc")
-			      .attr("title", function(d,i){ 
-			      	_d.children[i].endAngle = d.endAngle; 
-			      	_d.children[i].startAngle = d.startAngle;
-			      	_d.children[i].arc = this;
-			      	return d.data.name
-			      })
-			      .style("fill", function(d){return ( categories.hasOwnProperty(sectcat[d.data.name]) )? categories[sectcat[d.data.name]].color : "black"; });
-
-			    self.nodez.push(g); 
-			}
 
 			$(window).on("scroll", function(){
 				//console.log($(window).scrollTop());
 				self.wst = $(window).scrollTop();
-				positionStacks();
+				if(self.wst>self.headroom.top){
+					positionStacks(self.wst);
+				} else {
+					positionStacks(self.headroom.top);
+				}
 				// prevY0 = wst*-1;
 				// prevY1 = 220 + wst*-0.04;
 				// var newData = vareaStack(values,pad,prevY1,prevY0); 
@@ -209,26 +199,32 @@
 			});
 		}
 
-		function positionStacks(){
-			self.gees.attr("transform", function(d,i){
-				//var yoffset = self.height*0.4+self.originScale(d.stack)+(i*self.opad)-(self.wst*0.04);
-				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.scrollScale(self.wst)*-1//-(self.wst*0.04);
+		function positionStacks(wst){
+			self.gees.attr("transform", function(d,i,e){
+				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.scrollScale(wst);
 				d.yoffset = yoffset;
 				return "translate("+self.ox+","+yoffset+")";
 			});
-			self.orects.attr("width", self.rectW)
-				.attr("height",function(d,i){ return self.originScale(d.size); });
 
-			//log( self.scrollScale( self.gees[0][0].__data__.yoffset ) );
-
-			self.valueGroup.forEach(function(d,i){
-				var yoff = self.gees[0][i].__data__.yoffset;
-				var newData = vareaStack(d,self.pad,0, 0 ); //(self.wst*-0.4+(yoff*10))
-				self.vareaGroup[i].data(newData.links).attr("d", self.area);
-				self.drectGroup[i].data(newData.drects).attr("x", function(d){return d.x})
+			self.focusGroup.value.forEach(function(d,i){
+				//var yoff = self.focusGroup.gs[i].__data__.yoffset;
+				var topoff = self.focusGroup.gs[i].getBoundingClientRect().top+wst;
+				var newData = vareaStack(d,self.pad,0, 0 ); //(wst*-0.4+(yoff*10))
+				self.focusGroup.varea[i].data(newData.links).attr("d", self.area);
+				self.focusGroup.drect[i].data(newData.drects).attr("x", function(d){return d.x})
 					.attr("y", function(d){return d.y1})
 					.attr("width", self.rectW)
 					.attr("height", function(d){return d.y0});
+			});
+
+			self.gees[0].forEach(function(d,i){
+				var bcr = d3.select(self.gees[0][i]).select(".orect")[0][0].getBoundingClientRect();
+				var sctop =  bcr.top;
+				if(sctop <= self.winHalf && (sctop+bcr.height) >= self.winHalf){
+					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i);
+				} else {
+					removeVarea(i);
+				}
 			});
 
 			// var first = [newData.links[0][0].y1, newData.links[0][3].y1];
@@ -255,9 +251,49 @@
 				.attr("height", function(d){return d.y0})
 				//.attr("stroke", function(d){ return d.clr })
 				.attr("fill", function(d){ return d.clr });//url(#linkgrad)
-			self.valueGroup.push(self.values);
-			self.vareaGroup.push(self.varea);
-			self.drectGroup.push(self.drects);
+			self.focusGroup.value.push(self.values);
+			self.focusGroup.varea.push(self.varea);
+			self.focusGroup.drect.push(self.drects);
+			self.focusGroup.gs.push(self.gees[0][n]);
+			self.focusGroup.gn.push(n);
+		}
+
+		function removeVarea(n){
+			var index = self.focusGroup.gn.indexOf(n);
+			if(index == -1) return;
+			self.focusGroup.varea[index].remove();
+			self.focusGroup.drect[index].remove();
+
+			self.focusGroup.value.splice(index,1);
+			self.focusGroup.varea.splice(index,1);
+			self.focusGroup.drect.splice(index,1);
+			self.focusGroup.gs.splice(index,1);
+			self.focusGroup.gn.splice(index,1);
+		}
+
+		function vareaStack(_a, _pad, _p1, _p0){
+			//_a.sort(function(a,b){return b-a});
+			//self.startScale.domain([0, d3.max(_a)]);//d3.min(_a)
+			self.endScale.domain([0, d3.max(_a.map(function(d){return d.val;}))]); d3.max(_a);
+			var rectD = []
+			var _astack = _a.map(function(d,i){ 
+				var startone = _p1,
+				startzero = self.originScale(d.val)+_p1,
+				endone = _p0,
+				endzero = self.endScale(d.val)+_p0,
+				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : "white",
+				dat = [
+					{x: self.rectW, y1: startone, y0: startzero, clr: color, name:d.name}, 
+					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
+					{x: self.width-self.dx-self.rectW-self.innerbend, y1: endone, y0: endzero}, 
+					{x: self.width-self.dx-self.rectW, y1: endone, y0: endzero}
+				];
+				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color, name:d.name});
+				_p1 = startzero+_pad[1]-2;
+				_p0 = endzero+_pad[0];
+				return dat;
+			});
+			return {links:_astack, drects:rectD};
 		}
 
 		function vareaDimens(_a, _pad, _p1, _p0){
@@ -277,32 +313,6 @@
 				ph1-=_pad[1];
 
 				return {0:{start:_p0, end:ph0, height:Math.ceil(ph0-_p0)}, 1:{start:_p1, end:ph1, height:Math.ceil(ph1-_p1)}};
-		}
-
-
-		function vareaStack(_a, _pad, _p1, _p0){
-			//_a.sort(function(a,b){return b-a});
-			//self.startScale.domain([0, d3.max(_a)]);//d3.min(_a)
-			self.endScale.domain([0, d3.max(_a.map(function(d){return d.val;}))]); d3.max(_a);
-			var rectD = []
-			var _astack = _a.map(function(d,i){ 
-				var startone = _p1,
-				startzero = self.originScale(d.val)+_p1,
-				endone = _p0,
-				endzero = self.endScale(d.val)+_p0,
-				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : "black",
-				dat = [
-					{x: self.rectW, y1: startone, y0: startzero, clr: color, name:d.name}, 
-					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
-					{x: self.width-self.dx-self.rectW-self.innerbend, y1: endone, y0: endzero}, 
-					{x: self.width-self.dx-self.rectW, y1: endone, y0: endzero}
-				];
-				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color, name:d.name});
-				_p1 = startzero+_pad[1]-2;
-				_p0 = endzero+_pad[0];
-				return dat;
-			});
-			return {links:_astack, drects:rectD};
 		}
 
 		function updateHash(){
