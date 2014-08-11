@@ -54,10 +54,10 @@
 			self.height = $(window).height();
 			//self.winSpan = [self.height*0.4, self.height-self.height*0.4];
 			self.winHalf = self.height*0.5;
-			self.ox = self.width*0.3;
-			self.dx = self.width*0.6;
+			self.ox = self.width*0.35;
+			self.dx = self.width*0.7;
 			self.rectW = self.width*0.06;
-			self.innerbend = self.width*0.08;
+			self.innerbend = self.width*0.02;
 			self.opad = 4; 
 		}
 		function updateSize(){
@@ -136,7 +136,7 @@
 				.x(function(d) { return d.x; })
 				.y1(function(d) { return d.y1; })
 				.y0(function(d) { return d.y0 })
-				.interpolate('basis');
+				.interpolate('monotone');
 
 			// var color = d3.scale.linear()
 			//     .domain([-1, 5])
@@ -163,17 +163,23 @@
 				.attr("width",self.rectW)
 				.attr("height",function(d){return self.originScale(d.size);})
 				.attr("x",0)
-				.attr("y",0);
+				.attr("y",0)
+				.on("click",function(d,i){
+					var bcr = d3.select(this)[0][0].getBoundingClientRect();
+					var yoff = self.originScale(d.stack)+(i*self.opad);//+self.scrollScale(self.wst);
+					console.log(yoff);
+					//$(window).scrollTop(yoff*40);
+				});
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
-				.attr("x",function(d){return d.name.length*-6})
+				.attr("x",0)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
 				.text(function(d){return d.name});
 			self.ovlabels = self.gees.append("text")
 				.attr("class", "ovlabel")
 				.attr("x",4)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
-				.text(function(d){return "$"+Math.floor(d.size*0.000001)+"M" });
+				.text(function(d){return "$"+(d.size*0.000001).toFixed(1)+"M" });
 
 			self.pad = [20, 0];
 			self.focusGroup = {
@@ -265,12 +271,16 @@
 				.attr("height", function(d){return d.y0})
 				//.attr("stroke", function(d){ return d.clr })
 				.attr("fill", function(d){ return d.clr });//url(#linkgrad)
-
 			self.dgs.append("text")
 				.attr("class", 'dlabel')
 				.attr("x", self.rectW)
 				.attr("y", function(d){return d.y0*0.5})
-				.text(function(d){return d.name})			
+				.text(function(d){return d.name});
+			self.dgs.append("text")
+				.attr("class", "dlabel dvlabel")
+				.attr("x",self.rectW-4)
+				.attr("y",function(d){return d.y0*0.5})
+				.text(function(d){return "$"+(d.amount*0.000001).toFixed(1)+"M" });		
 
 			self.focusGroup.value.push(self.values);
 			self.focusGroup.varea.push(self.varea);
@@ -310,7 +320,7 @@
 					{x: self.width-self.dx-self.rectW-self.innerbend, y1: endone, y0: endzero}, 
 					{x: self.width-self.dx-self.rectW, y1: endone, y0: endzero}
 				];
-				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color.darker(0.1).toString(), name:d.name});
+				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color.darker(0.1).toString(), name:d.name, amount:d.val});
 				_p1 = startzero+_pad[1]-2;
 				_p0 = endzero+_pad[0];
 				return dat;

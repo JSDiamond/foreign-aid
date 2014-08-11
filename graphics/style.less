@@ -24,28 +24,37 @@ html,body{}
 	}
 }
 .g_node{
+	-webkit-transition: opacity 0.3s;
 	&.blurred{
 		opacity: 0.3;
-		// .varea{
-		// 	fill-opacity: 0.2;
-		// }
-		// .drect{
-		// 	fill-opacity: 0.3;
-		// }
+		.olabel{
+			font: 300 10px/14px "Arial";
+		}
 		.ovlabel{
-			display: none;
+			opacity: 0;
+		}
+		.dvlabel{
+			opacity: 0;
 		}
 	}
 }
 .olabel{
 	fill: #333;
-	font: 300 10px/14px "Arial";
+	text-anchor:end;
+	font: 300 20px/14px "Arial";
 }
 .ovlabel{
 	fill: #333;
 	font: 300 10px/14px "Arial";
+	-webkit-transition: opacity 0.3s;
 }
 .dlabel{
 	fill: #333;
 	font: 300 14px/18px "Arial";
+}
+.dvlabel{
+	fill: #333;
+	font: 300 14px/18px "Arial";
+	text-anchor:end;
+	-webkit-transition: opacity 0.3s;
 }
