@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+	<head>
+
+		<meta charset="utf-8">
+		<title>project</title>
+
+		<link rel="stylesheet" href="graphics/style.css">
+
+		<script type="text/javascript" src="js/vendor/jquery-1.11.1.min.js"></script>
+		<script type="text/javascript" src="js/vendor/d3-3.4.11.min.js"></script>
+
+	</head>
+	<body>
+		<div id="header" class="banner"></div>
+		<div id="viz"></div>
+		<!-- <div id="scrollspace"></div> -->
+		<div id="footer" class="banner"></div>
+		
+		<script src="js/data/categories.js"></script>
+		<script src="js/data/sectors.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var app = faid('#viz');
+			});
+		</script>
+
+	</body>
+</html>
