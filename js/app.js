@@ -92,7 +92,7 @@
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2.5)]);//-(self.tree_obj.children.length*self.opad)
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*6)]);//-(self.tree_obj.children.length*self.opad)
 
 			var scrollsize = self.originScale(self.tree_obj.size)*(6)+(self.opad*self.tree_obj.children.length-1);
 			self.height = scrollsize;
