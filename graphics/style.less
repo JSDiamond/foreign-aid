@@ -1,5 +1,11 @@
 *{margin:0;padding:0;}
-html,body{}
+
+
+.nopoint(){
+	pointer-events:none;
+}
+
+
 
 #viz{
 	background-color: #fff;
@@ -11,8 +17,7 @@ html,body{}
 	background-color: #eee;
 }
 .orect{
-	fill: #888;
-	fill-opacity: 0.5;
+	fill-opacity: 1;
 }
 .drect{
 	fill-opacity: 1;
@@ -27,6 +32,12 @@ html,body{}
 	-webkit-transition: opacity 0.3s;
 	&.blurred{
 		opacity: 0.3;
+		&:hover{
+			opacity: 0.8;
+			.olabel{
+				font: 300 15px/14px "Arial";
+			}
+		}
 		.olabel{
 			font: 300 10px/14px "Arial";
 		}
@@ -42,19 +53,23 @@ html,body{}
 	fill: #333;
 	text-anchor:end;
 	font: 300 20px/14px "Arial";
+	.nopoint()
 }
 .ovlabel{
 	fill: #333;
 	font: 300 10px/14px "Arial";
 	-webkit-transition: opacity 0.3s;
+	.nopoint()
 }
 .dlabel{
 	fill: #333;
 	font: 300 14px/18px "Arial";
+	.nopoint()
 }
 .dvlabel{
 	fill: #333;
 	font: 300 14px/18px "Arial";
 	text-anchor:end;
 	-webkit-transition: opacity 0.3s;
+	.nopoint()
 }

@@ -4,6 +4,7 @@
 		var sectcat = {"Counter-Terrorism":"Peace and Security","Combating Weapons of Mass Destruction (WMD)":"Peace and Security","Stabilization Operations and Security Sector Reform":"Peace and Security","Counter-Narcotics":"Peace and Security","Transnational Crime":"Peace and Security","Conflict Mitigation and Reconciliation":"Peace and Security","Peace and Security - General":"Peace and Security","Rule of Law and Human Rights":"Democracy, Human Rights, and Governance","Good Governance":"Democracy, Human Rights, and Governance","Political Competition and Consensus-Building":"Democracy, Human Rights, and Governance","Civil Society":"Democracy, Human Rights, and Governance","Democracy, Human Rights, and Governance - General":"Democracy, Human Rights, and Governance","HIV/AIDS":"Health","Tuberculosis":"Health","Malaria":"Health","Pandemic Influenza and Other Emerging Threats (PIOET)":"Health","Other Public Health Threats":"Health","Maternal and Child Health":"Health","Family Planning and Reproductive Health":"Health","Water Supply and Sanitation":"Health","Nutrition":"Health","Health - General":"Health","Basic Education":"Education And Social Services","Higher Education":"Education And Social Services","Policies, Regulations, and Systems":"Education And Social Services","Social Services":"Education And Social Services","Social Assistance":"Education And Social Services","Education and Social Services - General":"Education And Social Services","Macroeconomic Foundation for Growth":"Economic Development","Trade and Investment":"Economic Development","Financial Sector":"Economic Development","Infrastructure":"Economic Development","Agriculture":"Economic Development","Private Sector Competitiveness":"Economic Development","Economic Opportunity":"Economic Development","Labor Policies and Markets":"Economic Development","Manufacturing":"Economic Development","Mining and Natural Resources":"Economic Development","Economic Development - General":"Economic Development","Environment":"Environment","Natural Resources and Biodiversity":"Environment","Clean Productive Environment":"Environment","Environment - General":"Environment","Protection, Assistance and Solutions":"Humanitarian Assistance","Disaster Readiness":"Humanitarian Assistance","Migration Management":"Humanitarian Assistance","Humanitarian Assistance - Generall":"Humanitarian Assistance","Direct Administrative Costs":"Program Management","Monitoring and Evaluation":"Program Management","International Contributions":"Multi-sector","Debt Relief":"Multi-sector"};
 		var stops = ["Worldwide", "Bureau for Management (USAID)", "Bureau for Policy, Planning and Learning (USAID)", "International Organizations and Development Institutions (US Treasury) - African Development Bank (AfDB)", "International Organizations and Development Institutions (US Treasury) - African Development Fund (AfDF)", "International Organizations and Development Institutions (US Treasury) - Asian Development Bank (AsDB)", "International Organizations and Development Institutions (US Treasury) - Asian Development Fund (AsDF)", "International Organizations and Development Institutions (US Treasury) - Clean Technology Fund (CTF)", "International Organizations and Development Institutions (US Treasury) - European Bank for Reconstruction & Development (EBRD)", "International Organizations and Development Institutions (US Treasury) - Global Agriculture and Food Security Program (GAFSP)", "International Organizations and Development Institutions (US Treasury) - Global Environment Facility (GEF)", "International Organizations and Development Institutions (US Treasury) - Inter-American Development Bank (IDB and FSO)", "International Organizations and Development Institutions (US Treasury) - Inter-American Investment Corporation (IIC)", "International Organizations and Development Institutions (US Treasury) - International Bank for Reconstruction and Development (IBRD)", "International Organizations and Development Institutions (US Treasury) - International Development Association (IDA)", "International Organizations and Development Institutions (US Treasury) - International Fund for Agricultural Development (IFAD)", "International Organizations and Development Institutions (US Treasury) - Multilateral Investment Fund (MIF)", "International Organizations and Development Institutions (US Treasury) - North American Development Bank (NADBank)", "International Organizations and Development Institutions (US Treasury) - Strategic Climate Funds (SCF)", "Office of Innovation and Development Alliances (USAID)", "U.S. Department of the Treasury - Global", "U.S. Department of the Treasury - Office of Technical Assistance - World-Wide Office", "USAID Administrative Costs", "USAID Democracy, Conflict and Humanitarian Assistance", "USAID Economic Growth, Education and Environment", "USAID Global Health", "USAID Inspector General Operating Expense", "USAID Legislative and Public Affairs (LPA)", "USAID Office of Development Partners", "USAID Operating Expense", "USAID Regional Development Mission-Asia", "USAID West Africa Regional"];
 		var recipients_regional = ["Iraq", "Iran", "Joint Europe and Eurasia Regional","State Africa Regional","State Near East Regional/Middle East Partnership Initiative","Argentina","Belize","Bolivia","Brazil","Chile","Colombia","Costa Rica","Dominican Republic","Ecuador","El Salvador","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Paraguay","Peru","Uruguay","Albania","Armenia","Benin","Burkina Faso","Cabo Verde","Georgia","Ghana","Indonesia","Jordan","Lesotho","Liberia","Madagascar","Malawi","Mali","Moldova","Mongolia","Morocco","Mozambique","Namibia","Nepal","Niger","Philippines","Rwanda","Senegal","Tanzania","Tunisia","Zambia","Azerbaijan","Botswana","Bulgaria","Cambodia","Cameroon","Caribbean Region","China","Ethiopia","Fiji","Gambia, The","Guinea","Guyana","Kenya","Kyrgyz Republic","Macedonia","Mauritania","Micronesia","Romania","Samoa","Sierra Leone","South Africa","Suriname","Swaziland","Thailand","Togo","Tonga","Turkmenistan","Uganda","Ukraine","Vanuatu","Africa Region","Burundi","Chad","Djibouti","Nigeria","Somalia","Zimbabwe","Belarus","Central Asia Region","Eurasia Region","Kazakhstan","Montenegro","Russia","Tajikistan","Uzbekistan","Afghanistan","Angola","Asia Region","Bangladesh","Burma","Congo, Democratic Republic of","East Africa Region","East Asia Region","India","Pakistan","Sri Lanka","Sudan, Pre-2011 Election","West Africa Region","Algeria","Central African Republic","Central American Region","Congo, Republic of","Cote d'Ivoire","Eastern European Region","Near East Region","South Africa Region","South Sudan","Sudan","Syrian Arab Republic","Yemen","Bosnia and Herzegovina","Egypt","Serbia","Kosovo","West Bank and Gaza","Comoros","Cuba","Cyprus","Eritrea","Ireland","Israel","Latin America and Caribbean Region","Lebanon","Libya","South Pacific Region","Timor-Leste","Turkey","USAID Middle East Regional","Venezuela","Vietnam","Laos","Papua New Guinea","South America Region","Barbados and Eastern Caribbean","Bhutan","Guinea-Bissau","Hungary","Japan","Korea, North","Korea, South","Maldives","Marshall Islands","New Zealand","Palau","Solomon Islands","South Asia Region","United Arab Emirates","Central Africa Region Program for Environment","Czech Republic","Equatorial Guinea","Gabon","Greece","Mauritius","Sao Tome and Principe","Seychelles","Taiwan","Canada","United Kingdom","Austria","Bahamas, The","Barbadas","Belgium","Croatia","Denmark","Dominica","Estonia","Finland","France","Germany","Grenada","Italy","Latvia","Lithuania","Malaysia","Netherlands","Norway","Oman","Poland","Portugal","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Singapore","Slovak Republic","Slovenia","Spain","Sweden","Switzerland","Trinidad and Tobago","Tuvalu","State Western Hemisphere Regional","Joint Eurasia Regional","USAID Central Asia Regional","Asia Middle East Regional","USAID Africa Regional","USAID Caribbean Regional","USAID Central America Regional","USAID East Africa Regional","USAID Latin America and Caribbean Regional","Food Security (USAID)","USAID Central Africa Regional","USAID South America Regional","USAID Southern Africa Regional","Near East Regional","Office of Afghanistan and Pakistan Affairs (USAID)","Antigua and Barbuda","Iceland","U.S. Department of the Treasury - Latin America and Caribbean","U.S. Department of the Treasury - Vietnam, Cambodia, Asia Regional","Kiribati"];
+		var regioncolor = {"Middle East":{color:""},"Africa":{color:""},"Europe":{color:""},"Central America":{color:""},"South America":{color:""},"Asia":{color:""},"North America":{color:""},"Oceania":{color:""}};
 		var self = window.faid,
 		elmnt = $(selector),
 		hashed = {
@@ -19,8 +20,8 @@
 
 		function init(){
 			updateHash();
-			location.hash = hashed.year+"/"+hashed.d1+"/"+hashed.d2+"/"+encodeURIComponent(hashed.focus);
-			
+			location.hash = hashed.year+"/"+hashed.columns[0]+"/"+hashed.columns[1]+"/"+encodeURIComponent(hashed.focus);
+			self.columns = hashed.columns;
 			//assign colors and and sectors to categories
 			for(var key in categories){
 				var sects = categories[key].sectors.split("|");
@@ -29,20 +30,48 @@
 					sectcat[d] = key;
 				});
 			}
+			for(var k in regioncolor) regioncolor[k].color = d3.rgb(randomColor());
+
 			setSize();
-			getData();
+			getData(hashed.columns);
 			//$(window).scrollTop(0, 0);
-			// $(window).on('hashchange', function() {
-			// 	updateHash();
-			// 	hashChanged();
-			// });
+			$(window).on('hashchange', function() {
+				updateHash();
+				if(self.columns[0]!=hashed.columns[0] || self.year!=hashed.year){
+					hashChanged();
+				} else {
+					if(hashed.focus){
+						findNode();
+					}
+				}
+				self.columns = hashed.columns;
+			});
 		}
 
-		function getData(){
+		function updateHash(){
+			hashed.hash = window.location.hash.substr(1).split("/");
+			hashed.year = ( hashed.years.indexOf(hashed.hash[0])!=-1 )? hashed.hash[0] : "2009";
+			// hashed.d1 = ( hashed.columns.indexOf(hashed.hash[1])!=-1 )? hashed.hash[1] : "2";
+			// hashed.d2 = ( hashed.columns.indexOf(hashed.hash[2])!=-1 )? (hashed.hash[2]==hashed.d1)? "1" : hashed.hash[2] : "1";
+			//hashed.columns = (hashed.columns[0]==1)? [2,1] : [1,2];
+			hashed.columns = ( hashed.hash[1]==1 )? [1,2] : [2,1];
+			hashed.focus = decodeURIComponent(hashed.hash[3]) || "";
+		}
+
+		function hashChanged(){
+			removeSVG();
+			if(hashed.year!=self.year){
+				getData(hashed.columns);
+			}else{
+				buildTreeData(self.aid,hashed.columns[0],hashed.columns[1]);
+			}
+		}
+
+		function getData(cols){
 			$.getScript("js/data/aid_"+hashed.year+".js", function(data){
 				self.year = hashed.year;
 				self.aid = aid.filter(function(d){ return d[3]>=0 });
-				buildTreeData(self.aid,1,2);
+				buildTreeData(self.aid,hashed.columns[0],hashed.columns[1]);
 			});
 		}
 
@@ -63,19 +92,24 @@
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2)]);//-(self.tree_obj.children.length*self.opad)
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2.5)]);//-(self.tree_obj.children.length*self.opad)
 
-			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.07)+(self.opad*self.tree_obj.children.length-1);
+			var scrollsize = self.originScale(self.tree_obj.size)*(6)+(self.opad*self.tree_obj.children.length-1);
 			self.height = scrollsize;
-			self.oy = self.height*0.004;
+			self.oy = self.height*0.04;
 
 			d3.select(selector).style("height", self.height+"px");
 			self.headroom = {top:elmnt.offset().top, bottom:elmnt.outerHeight()}
 			self.oheight = self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length-1);
-			self.scrollScale = d3.scale.linear().domain([self.headroom.top, $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
+			//self.scrollScale = d3.scale.linear().domain([self.headroom.top, $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
+
+			self.scrollScale = d3.scale.linear().domain([(self.headroom.top), $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
+			
+			self.stretch = d3.scale.linear().domain([-2, self.oheight]).range([self.oy, scrollsize-self.oheight-self.oy]);
 
 			if(self.svg){
 				self.svg.attr("width", self.width).attr("height", self.height);
+				self.orects.attr("width",self.rectW).attr("height",function(d){return self.originScale(d.size);})
 				if(self.wst>self.headroom.top){
 					positionStacks(self.wst);
 				} else {
@@ -100,11 +134,35 @@
 				}).sort(function(a,b){return b.size-a.size});
 				self.tree_obj.children.push({"name":d.key,"children":kids});
 			});
+
+			var bins = {};
+			var bintype = (hashed.columns[0]==1)? regions : sectcat;
 			self.tree_obj.children.forEach(function(d){
+				//assign the total size of children
 			  	d.size = d.children.reduce(function(a,b){return {size: a.size + b.size};}).size; 
+			  	
+			  	//GROUPSORT: make groups for each category bin
+			  	var bin = bintype[d.name]
+			  	if(bins.hasOwnProperty(bin)){
+			  		bins[bin].children.push(d);
+			  	}else{
+			  		bins[bin]={children:[d], size:0, name:bin};
+			  	}
 			});
+			var binarray = [];
+			for(var k in bins){
+				bins[k].size = bins[k].children.reduce(function(a,b){return {size: a.size + b.size};}).size;
+				bins[k].children.sort(function(a,b){return b.size-a.size});
+				binarray.push(bins[k]);
+			}
+			binarray.sort(function(a,b){return b.size-a.size});
+			self.tree_obj.children  = binarray.reduce(function(a, b){return {children: a.children.concat(b.children)} }).children;
+
 			self.tree_obj["size"] = self.tree_obj.children.reduce(function(a,b){return {size: a.size + b.size};}).size; 
-			self.tree_obj.children.sort(function(a,b){return b.size-a.size})
+			
+			//this sort is only needed if group sorting is not used
+			//self.tree_obj.children.sort(function(a,b){return b.size-a.size})
+			
 			log(self.tree_obj);
 			self.originScale = d3.scale.linear().domain([0, self.tree_obj.size]).range([2, (self.height*1.5)]);//-(self.tree_obj.children.length*self.opad)
 			updateSize();
@@ -121,8 +179,6 @@
 		}
 
 		function renderLayout(root){
-			self.nodez = [];
-
 			self.startScale = d3.scale.linear().domain([0, 100]).range([0, 8]);
 			self.endScale = d3.scale.linear().domain([0, 100]).range([2, 100]);
 			self.paralaxScale = d3.scale.linear().domain([0, 100]).range([0, 100]);
@@ -157,18 +213,17 @@
 				.data(root.children)
 				.enter().append("g")
 				.attr("class", function(d){ return d.parent ? d.children ? "g_node" : "g_node g_node--leaf" : "g_node g_node--root"; })
-
+			//$('body').on('click',function(){console.log("wst = "+self.wst)})
 			self.orects = self.gees.append("rect")
 				.attr("class", "orect")
 				.attr("width",self.rectW)
 				.attr("height",function(d){return self.originScale(d.size);})
 				.attr("x",0)
 				.attr("y",0)
+				.attr("fill", function(d){return colorChoice(d).toString()})
 				.on("click",function(d,i){
-					var bcr = d3.select(this)[0][0].getBoundingClientRect();
-					var yoff = self.originScale(d.stack)+(i*self.opad);//+self.scrollScale(self.wst);
-					console.log(yoff);
-					//$(window).scrollTop(yoff*40);
+					focusViz(d.name);
+					scrollToNode(d,i);
 				});
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
@@ -179,7 +234,7 @@
 				.attr("class", "ovlabel")
 				.attr("x",4)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
-				.text(function(d){return "$"+(d.size*0.000001).toFixed(1)+"M" });
+				.text(function(d){return valueClean(d.size,1) });
 
 			self.pad = [20, 0];
 			self.focusGroup = {
@@ -187,41 +242,79 @@
 				varea:[],
 				dgs:[],
 				gs:[],
-				gn:[]
+				gn:[],
+				main: 0
 			}
-			// bindVarea(0);
-			// bindVarea(1);
-			// bindVarea(2);
-			// bindVarea(3);
-			// bindVarea(4);
-			// bindVarea(5);
-			// bindVarea(100);
 
 			positionStacks(self.headroom.top);
-			  // self.nodez = sortKey(self.nodez,['__data__','value']);
-			  // var node = self.svg.selectAll(".g_node"); //.g_node,text
 
 			$(window).on("scroll", function(){
-				//console.log($(window).scrollTop());
 				self.wst = $(window).scrollTop();
 				if(self.wst>self.headroom.top){
 					positionStacks(self.wst);
 				} else {
+					self.wst = self.headroom.top;
 					positionStacks(self.headroom.top);
 				}
-				// prevY0 = wst*-1;
-				// prevY1 = 220 + wst*-0.04;
-				// var newData = vareaStack(values,pad,prevY1,prevY0); 
-				// vstack.data(newData).attr("d", area);
 			});
+			if(hashed.focus){
+				findNode();
+			}
+		}
+
+		function findNode(){
+			self.tree_obj.children.forEach(function(d,i){
+				if(d.name===hashed.focus){
+					scrollToNode(d,i);
+				}
+			})
+		}
+
+		function colorChoice(d){
+			var color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : ( regioncolor.hasOwnProperty(regions[d.name]) )? regioncolor[regions[d.name]].color : d3.rgb("rgb(200,200,200)");
+			return color;
+		}
+
+		function scrollToNode(d,i){
+			//var direct = (self.focusGroup.main<i)? $(document).height()-$(window).height() : 0;
+			// for(var iter=0; iter<2200; iter++){
+			// 	self.wst+=(1*direct);
+			// 	$(window).scrollTop(self.wst);
+			// 	console.log(i);
+			// 	console.log(self.focusGroup.main);
+			// }
+
+			// while (self.focusGroup.main!=i){
+			// 	self.wst+=(1*direct);
+			// 	$(window).scrollTop(self.wst);
+			// }
+
+			// $("html, body").animate({ scrollTop: direct },2222,"swing");
+
+			var origin = self.originScale(d.stack)+((i)*self.opad);
+			var yoff = self.headroom.top+origin;//+self.oy;
+			var strch = self.stretch(origin);//faid.scrollScale.invert( self.stretch(origin) )
+			var centered = (yoff-self.winHalf)+(origin*0.0001);//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
+			// console.log("origin = "+origin);
+			// console.log("self.stretch = "+ self.stretch(origin));
+			// console.log("centered = "+centered);
+			//$(window).scrollTop(centered);
+			$("html, body").stop().animate({ scrollTop: centered },1000,"swing",function(){positionStacks(centered);});
+		}
+
+		function blurTest(i,name){
+			if(i!=self.focusGroup.main){
+				if(!d3.select(self.gees[0][i]).classed("blurred")){d3.select(self.gees[0][i]).classed("blurred",true);}
+			}else{ 
+				if(d3.select(self.gees[0][i]).classed("blurred")){d3.select(self.gees[0][i]).classed("blurred",false);}
+			}
 		}
 
 		function positionStacks(wst){
 			self.gees.attr("transform", function(d,i){
-				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.scrollScale(wst);
+				var yoffset = self.originScale(d.stack)+(i*self.opad);//+self.scrollScale(wst);
 				d.yoffset = yoffset;
-				if(i!=self.focusGroup.gn[0]){ d3.select(self.gees[0][i]).classed("blurred",true);
-				}else{d3.select(self.gees[0][i]).classed("blurred",false);}
+				blurTest(i,d.name);
 				return "translate("+self.ox+","+yoffset+")";
 			});
 
@@ -239,9 +332,9 @@
 			self.gees[0].forEach(function(d,i){
 				var bcr = d3.select(self.gees[0][i]).select(".orect")[0][0].getBoundingClientRect();
 				if(bcr.top-self.opad*0.5 <= self.winHalf && (bcr.top+bcr.height+self.opad*0.5) >= self.winHalf){
-					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i);
-					if(self.focusGroup.gn.indexOf(i-1)==-1 && self.gees[0][i-1]) bindVarea(i-1);
-					if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
+					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i); self.focusGroup.main=i;
+					// if(self.focusGroup.gn.indexOf(i-1)==-1 && self.gees[0][i-1]) bindVarea(i-1);
+					// if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
 				} else {
 					if(i==self.focusGroup.gn[0]){removeVarea(i);}
 				}
@@ -261,7 +354,11 @@
 			self.dgs = d3.select(self.gees[0][n]).selectAll("dg")
 				.data(vareaData.drects).enter()
 				.append("g").attr("class", "dg")
-				.attr("transform", function(d){return "translate("+d.x+","+d.y1+")";});
+				.attr("transform", function(d){return "translate("+d.x+","+d.y1+")";})
+				.on("click",function(d,i){
+					hashed.columns = (hashed.columns[0]==1)? [2,1] : [1,2];
+					focusViz(d.name);
+				});
 
 			self.drects = self.dgs.append("rect")
 				.attr("class", 'drect')
@@ -280,7 +377,7 @@
 				.attr("class", "dlabel dvlabel")
 				.attr("x",self.rectW-4)
 				.attr("y",function(d){return d.y0*0.5})
-				.text(function(d){return "$"+(d.amount*0.000001).toFixed(1)+"M" });		
+				.text(function(d){return valueClean(d.size,1)});		
 
 			self.focusGroup.value.push(self.values);
 			self.focusGroup.varea.push(self.varea);
@@ -288,6 +385,18 @@
 			self.focusGroup.gs.push(self.gees[0][n]);
 			self.focusGroup.gn.push(n);
 			positionStacks(self.wst);
+		}
+
+		function valueClean(val,decimal){
+			if(val*0.000000001 > 1){
+				return "$"+(val*0.000000001).toFixed(decimal)+"B";
+			} else if(val*0.000001 > 1){
+				return "$"+(val*0.000001).toFixed(decimal)+"M";
+			} else if(val*0.001 > 1){//if(val*0.001 > 0)
+				return "$"+(val*0.001).toFixed(decimal)+"K";
+			} else {
+				return "$"+(val);	
+			}
 		}
 
 		function removeVarea(n){
@@ -313,14 +422,14 @@
 				startzero = self.originScale(d.val)+_p1,
 				endone = _p0,
 				endzero = self.endScale(d.val)+_p0,
-				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : d3.rgb("rgb(0,0,0)"),
+				color = colorChoice(d),
 				dat = [
 					{x: self.rectW, y1: startone, y0: startzero, clr: color.brighter(0.1).toString() , name:d.name}, 
 					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
 					{x: self.width-self.dx-self.rectW-self.innerbend, y1: endone, y0: endzero}, 
 					{x: self.width-self.dx-self.rectW, y1: endone, y0: endzero}
 				];
-				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color.darker(0.1).toString(), name:d.name, amount:d.val});
+				rectD.push({x: self.width-self.dx-self.rectW, y1: endone, y0: endzero-endone, clr: color.darker(0.1).toString(), name:d.name, size:d.val});
 				_p1 = startzero+_pad[1]-2;
 				_p0 = endzero+_pad[0];
 				return dat;
@@ -347,26 +456,13 @@
 				return {0:{start:_p0, end:ph0, height:Math.ceil(ph0-_p0)}, 1:{start:_p1, end:ph1, height:Math.ceil(ph1-_p1)}};
 		}
 
-		function updateHash(){
-			hashed.hash = window.location.hash.substr(1).split("/");
-			hashed.year = ( hashed.years.indexOf(hashed.hash[0])!=-1 )? hashed.hash[0] : "2009";
-			hashed.d1 = ( hashed.columns.indexOf(hashed.hash[1])!=-1 )? hashed.hash[1] : "2";
-			hashed.d2 = ( hashed.columns.indexOf(hashed.hash[2])!=-1 )? (hashed.hash[2]==hashed.d1)? "1" : hashed.hash[2] : "1";
-			hashed.focus = decodeURIComponent(hashed.hash[3]) || "";
+		function removeSVG(){
+			self.svg.remove();
 		}
 
-		function focusViz(d){
-			hashed.focus = d;
-			location.hash = hashed.year+"/"+hashed.d1+"/"+hashed.d2+"/"+encodeURIComponent(hashed.focus);
-		}
-
-		function hashChanged(){
-			d3.select("#viz svg").remove();
-			if(hashed.year!=self.year){
-				getData();
-			}else{
-				buildSankeyData(self.aid,hashed.d1,hashed.d2);
-			}
+		function focusViz(name){
+			hashed.focus = name;
+			location.hash = hashed.year+"/"+hashed.columns[0]+"/"+hashed.columns[1]+"/"+encodeURIComponent(hashed.focus);
 		}
 
 		self.api = {
