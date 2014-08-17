@@ -20,7 +20,7 @@
 		function init(){
 			updateHash();
 			location.hash = hashed.year+"/"+hashed.d1+"/"+hashed.d2+"/"+encodeURIComponent(hashed.focus);
-			
+			self.columns = [1,2]
 			//assign colors and and sectors to categories
 			for(var key in categories){
 				var sects = categories[key].sectors.split("|");
@@ -30,7 +30,7 @@
 				});
 			}
 			setSize();
-			getData();
+			getData(self.columns);
 			//$(window).scrollTop(0, 0);
 			// $(window).on('hashchange', function() {
 			// 	updateHash();
@@ -38,11 +38,11 @@
 			// });
 		}
 
-		function getData(){
+		function getData(cols){
 			$.getScript("js/data/aid_"+hashed.year+".js", function(data){
 				self.year = hashed.year;
 				self.aid = aid.filter(function(d){ return d[3]>=0 });
-				buildTreeData(self.aid,1,2);
+				buildTreeData(self.aid,cols[0],cols[1]);
 			});
 		}
 
@@ -63,19 +63,24 @@
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2)]);//-(self.tree_obj.children.length*self.opad)
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2.5)]);//-(self.tree_obj.children.length*self.opad)
 
-			var scrollsize = self.originScale(self.tree_obj.size)*(self.height*0.07)+(self.opad*self.tree_obj.children.length-1);
+			var scrollsize = self.originScale(self.tree_obj.size)*(6)+(self.opad*self.tree_obj.children.length-1);
 			self.height = scrollsize;
-			self.oy = self.height*0.004;
+			self.oy = self.height*0.04;
 
 			d3.select(selector).style("height", self.height+"px");
 			self.headroom = {top:elmnt.offset().top, bottom:elmnt.outerHeight()}
 			self.oheight = self.originScale(self.tree_obj.size)+(self.opad*self.tree_obj.children.length-1);
-			self.scrollScale = d3.scale.linear().domain([self.headroom.top, $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
+			//self.scrollScale = d3.scale.linear().domain([self.headroom.top, $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
+
+			self.scrollScale = d3.scale.linear().domain([(self.headroom.top), $(document).height()-$(window).height()]).range([self.oy, scrollsize-self.oheight-self.oy]);
+			
+			self.stretch = d3.scale.linear().domain([-2, self.oheight]).range([self.oy, scrollsize-self.oheight-self.oy]);
 
 			if(self.svg){
 				self.svg.attr("width", self.width).attr("height", self.height);
+				self.orects.attr("width",self.rectW).attr("height",function(d){return self.originScale(d.size);})
 				if(self.wst>self.headroom.top){
 					positionStacks(self.wst);
 				} else {
@@ -121,8 +126,6 @@
 		}
 
 		function renderLayout(root){
-			self.nodez = [];
-
 			self.startScale = d3.scale.linear().domain([0, 100]).range([0, 8]);
 			self.endScale = d3.scale.linear().domain([0, 100]).range([2, 100]);
 			self.paralaxScale = d3.scale.linear().domain([0, 100]).range([0, 100]);
@@ -157,18 +160,16 @@
 				.data(root.children)
 				.enter().append("g")
 				.attr("class", function(d){ return d.parent ? d.children ? "g_node" : "g_node g_node--leaf" : "g_node g_node--root"; })
-
+			//$('body').on('click',function(){console.log("wst = "+self.wst)})
 			self.orects = self.gees.append("rect")
 				.attr("class", "orect")
 				.attr("width",self.rectW)
 				.attr("height",function(d){return self.originScale(d.size);})
 				.attr("x",0)
 				.attr("y",0)
+				.attr("fill", function(d){var color=( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : d3.rgb("rgb(200,200,200)"); return color})
 				.on("click",function(d,i){
-					var bcr = d3.select(this)[0][0].getBoundingClientRect();
-					var yoff = self.originScale(d.stack)+(i*self.opad);//+self.scrollScale(self.wst);
-					console.log(yoff);
-					//$(window).scrollTop(yoff*40);
+					scrollToNode(d,i);
 				});
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
@@ -179,7 +180,7 @@
 				.attr("class", "ovlabel")
 				.attr("x",4)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
-				.text(function(d){return "$"+(d.size*0.000001).toFixed(1)+"M" });
+				.text(function(d){return valueClean(d.size,1) });
 
 			self.pad = [20, 0];
 			self.focusGroup = {
@@ -187,41 +188,72 @@
 				varea:[],
 				dgs:[],
 				gs:[],
-				gn:[]
+				gn:[],
+				main: 0
 			}
-			// bindVarea(0);
-			// bindVarea(1);
-			// bindVarea(2);
-			// bindVarea(3);
-			// bindVarea(4);
-			// bindVarea(5);
-			// bindVarea(100);
 
 			positionStacks(self.headroom.top);
-			  // self.nodez = sortKey(self.nodez,['__data__','value']);
-			  // var node = self.svg.selectAll(".g_node"); //.g_node,text
 
 			$(window).on("scroll", function(){
-				//console.log($(window).scrollTop());
 				self.wst = $(window).scrollTop();
 				if(self.wst>self.headroom.top){
 					positionStacks(self.wst);
 				} else {
+					self.wst = self.headroom.top;
 					positionStacks(self.headroom.top);
 				}
-				// prevY0 = wst*-1;
-				// prevY1 = 220 + wst*-0.04;
-				// var newData = vareaStack(values,pad,prevY1,prevY0); 
-				// vstack.data(newData).attr("d", area);
 			});
+			if(self.jumpto){
+				console.log(self.jumpto);
+				root.children.forEach(function(d,i){
+					if(d.name===self.jumpto){
+						scrollToNode(d,i);
+					}
+				})
+			}
+		}
+
+		function scrollToNode(d,i){
+			//var direct = (self.focusGroup.main<i)? $(document).height()-$(window).height() : 0;
+			// for(var iter=0; iter<2200; iter++){
+			// 	self.wst+=(1*direct);
+			// 	$(window).scrollTop(self.wst);
+			// 	console.log(i);
+			// 	console.log(self.focusGroup.main);
+			// }
+
+			// while (self.focusGroup.main!=i){
+			// 	self.wst+=(1*direct);
+			// 	$(window).scrollTop(self.wst);
+			// }
+
+			// $("html, body").animate({ scrollTop: direct },2222,"swing");
+
+			var origin = self.originScale(d.stack)+((i)*self.opad);
+			var yoff = self.headroom.top+origin;//+self.oy;
+			var strch = self.stretch(origin);//faid.scrollScale.invert( self.stretch(origin) )
+			var centered = (yoff-self.winHalf)+(origin*0.0001);//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
+			// console.log("origin = "+origin);
+			// console.log("self.stretch = "+ self.stretch(origin));
+			// console.log("centered = "+centered);
+			//$(window).scrollTop(centered);
+			$("html, body").animate({ scrollTop: centered },1000,"swing",function(){positionStacks(centered);});
+			
+		}
+
+		function blurTest(i){
+			if(i!=self.focusGroup.main){
+				if(!d3.select(self.gees[0][i]).classed("blurred")){d3.select(self.gees[0][i]).classed("blurred",true);}
+			}else{ 
+				if(d3.select(self.gees[0][i]).classed("blurred")){d3.select(self.gees[0][i]).classed("blurred",false);}
+			}
 		}
 
 		function positionStacks(wst){
 			self.gees.attr("transform", function(d,i){
-				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.scrollScale(wst);
+				var yoffset = self.originScale(d.stack)+(i*self.opad);//+self.scrollScale(wst);
 				d.yoffset = yoffset;
-				if(i!=self.focusGroup.gn[0]){ d3.select(self.gees[0][i]).classed("blurred",true);
-				}else{d3.select(self.gees[0][i]).classed("blurred",false);}
+				blurTest(i);
 				return "translate("+self.ox+","+yoffset+")";
 			});
 
@@ -239,9 +271,9 @@
 			self.gees[0].forEach(function(d,i){
 				var bcr = d3.select(self.gees[0][i]).select(".orect")[0][0].getBoundingClientRect();
 				if(bcr.top-self.opad*0.5 <= self.winHalf && (bcr.top+bcr.height+self.opad*0.5) >= self.winHalf){
-					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i);
-					if(self.focusGroup.gn.indexOf(i-1)==-1 && self.gees[0][i-1]) bindVarea(i-1);
-					if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
+					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i); self.focusGroup.main=i;
+					// if(self.focusGroup.gn.indexOf(i-1)==-1 && self.gees[0][i-1]) bindVarea(i-1);
+					// if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
 				} else {
 					if(i==self.focusGroup.gn[0]){removeVarea(i);}
 				}
@@ -261,7 +293,13 @@
 			self.dgs = d3.select(self.gees[0][n]).selectAll("dg")
 				.data(vareaData.drects).enter()
 				.append("g").attr("class", "dg")
-				.attr("transform", function(d){return "translate("+d.x+","+d.y1+")";});
+				.attr("transform", function(d){return "translate("+d.x+","+d.y1+")";})
+				.on("click",function(d,i){
+					self.jumpto = d.name;
+					removeSVG();
+					self.columns = (self.columns[0]==1)? [2,1] : [1,2];
+					getData(self.columns);
+				});
 
 			self.drects = self.dgs.append("rect")
 				.attr("class", 'drect')
@@ -280,7 +318,7 @@
 				.attr("class", "dlabel dvlabel")
 				.attr("x",self.rectW-4)
 				.attr("y",function(d){return d.y0*0.5})
-				.text(function(d){return "$"+(d.amount*0.000001).toFixed(1)+"M" });		
+				.text(function(d){return valueClean(d.amount,1)});		
 
 			self.focusGroup.value.push(self.values);
 			self.focusGroup.varea.push(self.varea);
@@ -288,6 +326,18 @@
 			self.focusGroup.gs.push(self.gees[0][n]);
 			self.focusGroup.gn.push(n);
 			positionStacks(self.wst);
+		}
+
+		function valueClean(val,decimal){
+			if(val*0.000000001 > 1){
+				return "$"+(val*0.000000001).toFixed(decimal)+"B";
+			} else if(val*0.000001 > 1){
+				return "$"+(val*0.000001).toFixed(decimal)+"M";
+			} else if(val*0.001 > 1){//if(val*0.001 > 0)
+				return "$"+(val*0.001).toFixed(decimal)+"K";
+			} else {
+				return "$"+(val);	
+			}
 		}
 
 		function removeVarea(n){
@@ -313,7 +363,7 @@
 				startzero = self.originScale(d.val)+_p1,
 				endone = _p0,
 				endzero = self.endScale(d.val)+_p0,
-				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : d3.rgb("rgb(0,0,0)"),
+				color = ( categories.hasOwnProperty(sectcat[d.name]) )? categories[sectcat[d.name]].color : d3.rgb("rgb(200,200,200)"),
 				dat = [
 					{x: self.rectW, y1: startone, y0: startzero, clr: color.brighter(0.1).toString() , name:d.name}, 
 					{x: self.rectW+self.innerbend, y1: startone, y0: startzero}, 
@@ -353,6 +403,10 @@
 			hashed.d1 = ( hashed.columns.indexOf(hashed.hash[1])!=-1 )? hashed.hash[1] : "2";
 			hashed.d2 = ( hashed.columns.indexOf(hashed.hash[2])!=-1 )? (hashed.hash[2]==hashed.d1)? "1" : hashed.hash[2] : "1";
 			hashed.focus = decodeURIComponent(hashed.hash[3]) || "";
+		}
+
+		function removeSVG(){
+			self.svg.remove();
 		}
 
 		function focusViz(d){
