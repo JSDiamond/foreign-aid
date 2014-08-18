@@ -21,6 +21,7 @@
 		function init(){
 			updateHash();
 			location.hash = hashed.year+"/"+hashed.columns[0]+"/"+hashed.columns[1]+"/"+encodeURIComponent(hashed.focus);
+			$("#year_button .fyear").text(hashed.year)
 			self.columns = hashed.columns;
 			//assign colors and and sectors to categories
 			for(var key in categories){
@@ -45,6 +46,11 @@
 				}
 				self.columns = hashed.columns;
 			});
+			$("#year_list li").on("click", function(){
+				var year = $(this).text();
+				$("#year_button .fyear").text(year);
+				location.hash = year+"/"+hashed.columns[0]+"/"+hashed.columns[1]+"/"+encodeURIComponent(hashed.focus);
+			})
 		}
 
 		function updateHash(){
@@ -52,6 +58,7 @@
 			hashed.year = ( hashed.years.indexOf(hashed.hash[0])!=-1 )? hashed.hash[0] : "2013";
 			hashed.columns = ( hashed.hash[1]==1 || hashed.columns.indexOf( parseInt(hashed.hash[1]) )==-1 )? [1,2] : [2,1];
 			hashed.focus = decodeURIComponent(hashed.hash[3]) || "";
+			hashed.focus = (hashed.focus==undefined)? "" : hashed.focus;
 			var bt = (hashed.columns[0]==1)? "region" : "sector";
 			$("#faid_bintype").text(bt);
 		}
@@ -92,9 +99,9 @@
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*6)]);//-(self.tree_obj.children.length*self.opad)
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*12)]);//-(self.tree_obj.children.length*self.opad)
 
-			var scrollsize = self.originScale(self.tree_obj.size)*(1.25)+(self.opad*self.tree_obj.children.length-1);
+			var scrollsize = self.originScale(self.tree_obj.size)*(1.15)+(self.opad*self.tree_obj.children.length-1);
 			self.oy = self.height*0.1;
 			self.height = scrollsize;
 
@@ -110,6 +117,12 @@
 			if(self.svg){
 				self.svg.attr("width", self.width).attr("height", self.height);
 				self.orects.attr("width",self.rectW).attr("height",function(d){return self.originScale(d.size);})
+				self.sections.forEach(function(d){
+					d3.select(d.rlab).attr("transform", "translate("+( (self.width-self.dx-self.rectW)*0.5 )+",-42)")
+					d3.select(d.rline)
+						.datum([{x:(self.ox)*-0.8,y:-10},{x:self.width*0.575,y:-10}])
+						.attr("d", self.line)
+				})
 				if(self.wst>self.headroom.top){
 					positionStacks(self.wst);
 				} else {
@@ -243,6 +256,7 @@
 					scrollToNode(d,i);
 				});
 			var regionlab = "";
+			self.sections = [];
 			self.line = d3.svg.line().x(function(d){return d.x;}).y(function(d){return d.y;});
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
@@ -253,15 +267,19 @@
 					if(bin!=regionlab){
 						regionlab = bin;
 						var parent = d3.select(this)[0][0].parentElement;
+						var rlab = "";
 						d3.select(parent).append("text")
 							.attr("class", "regionlabel")
 							.attr("x",0)
 							.attr("y",20)
-							.attr("transform", "translate("+( (self.width-self.dx-self.rectW)*0.5 )+",-42)")//rotate(90)//(self.ox*-0.8)
+							.attr("transform", function(d){
+								rlab = this;
+								return "translate("+( (self.width-self.dx-self.rectW)*0.5 )+",-42)";
+							})
 							.append('svg:tspan')
 							.attr('x', 0)//(self.ox*-0.9)
 							.attr('dy', 5)
-							.text(regionlab+" : "+valueClean(self.bins[regionlab].size,1))
+							.text(regionlab+" : "+valueClean(self.bins[regionlab].size,1));
 							// .append('svg:tspan')
 							// .attr('x', 0)
 							// .attr('dy', 20)
@@ -269,7 +287,10 @@
 						d3.select(parent).append('path')
 							.datum([{x:(self.ox)*-0.8,y:-10},{x:self.width*0.575,y:-10}])
 							.attr("d", self.line)
-							.attr("class", "rline");
+							.attr("class", function(d){
+								self.sections.push({"rlab":rlab, "rline":this});
+								return "rline";
+							});
 					}
 					return d.name
 				});
@@ -531,11 +552,3 @@
 	};
 	
 }( window || (window = {}) ) );
-
-
-// d3.selection.prototype.moveToFront = function() {
-// 		return this.each(function(){
-// 		this.parentNode.appendChild(this);
-// 	});
-// };
-

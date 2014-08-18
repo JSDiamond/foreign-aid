@@ -1,10 +1,91 @@
 *{margin:0;padding:0;}
 
+.opacity(@opacity) {
+    @ieOpacity: @opacity * 100;
+    -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(Opacity=@{ieOpacity})"; // IE 8
+    filter: ~"alpha(opacity=@{ieOpacity})"; // IE 5-7
+    opacity: @opacity;
+}
+
+.transition(@transition) {
+  -webkit-transition: @transition;
+     -moz-transition: @transition;
+       -o-transition: @transition;
+          transition: @transition;
+}
+
+.transform(@string){
+  -webkit-transform: @string;
+  -moz-transform:    @string;
+  -ms-transform:     @string;
+  -o-transform:      @string;
+}
+
+.textDisble (@type: none) {
+  -webkit-touch-callout: @type;
+  -webkit-user-select: @type;
+  -khtml-user-select: @type;
+  -moz-user-select: @type;
+  -ms-user-select: @type;
+  user-select: @type;
+}
+
+.rounded-corners (@radius: 2px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  -ms-border-radius: @radius;
+  -o-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.shadow (@color : #00000, @depth) {
+   -moz-box-shadow: 0 0 @depth @color ;
+   -webkit-box-shadow: 0 0 @depth @color ;
+   box-shadow: 0 0 @depth @color ;
+}
 
 .nopoint(){
 	pointer-events:none;
 }
 
+@media screen and (min-width: 440px) {
+}
+
+
+.data-viz{
+	.btn{display:inline-block;
+	 	margin-bottom:0;
+	 	font-weight:normal;
+	 	text-align:left;
+	 	vertical-align:middle;
+	 	cursor:pointer;
+	 	background-image:none;
+	 	border:1px solid #ddd;
+	 	white-space:nowrap;
+	 	padding:2px 6px;
+	 	border-radius:4px;
+	 	margin-top: -5px;
+	 	-webkit-user-select:none;
+	 	-moz-user-select:none;
+	 	-ms-user-select:none;
+	 	user-select:none
+	 }
+	.btn .caret {
+		margin-left: 4px;
+	}
+	.dropdown{
+		display: inline-block;
+	}
+	.dropdown-menu{
+		min-width: 70px;
+	}
+	 .dropdown-menu li{
+	 	text-align: center;
+	 }
+	 .dropdown-menu li a{
+	 	cursor: pointer;
+	 }
+}
 .dek{
 	padding-top: 10px;
 	padding-bottom: 4px;
@@ -13,7 +94,14 @@
 	font: 300 20px/24px 'Arial';
 	text-align: center;
 }
-
+.vsource{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-right: 6%;
+	padding-left: 6%;
+	font: 300 13px/24px 'Arial';
+	text-align: left;
+}
 #viz{
 	background-color: #fff;
 	position: relative;
@@ -29,73 +117,155 @@
 }
 .orect{
 	fill-opacity: 1;
+	cursor: pointer;
+	&:hover{
+		stroke: #444;
+		stroke-width: 1px;
+	}
 }
 .drect{
 	fill-opacity: 1;
+	cursor: pointer;
+	&:hover{
+		stroke: #444;
+		stroke-width: 1px;
+	}
 }
 .varea{
 	fill-opacity: 0.4;
 }
-.g_node{
-	-webkit-transition: opacity 0.3s;
-	&.blurred{
-		opacity: 0.4;
-		&:hover{
-			opacity: 0.8;
-			.olabel{
-				font: 300 13px/17px "Arial";
+
+//  (max-width: 700px)
+// #2 (min-width: 701px) and (max-width: 900px)
+// #3 (max-width: 901px)
+
+@media screen and (min-width: 0px) and (max-width: 768px) {
+		.g_node{
+			.transition(opacity 0.3s);
+			&.blurred{
+				.opacity(0.4);
+				&:hover{
+					.opacity(0.8);
+					.olabel{
+						font: 300 11px/17px "Arial";
+					}
+				}
+				.olabel{
+					font: 300 9px/14px "Arial";
+				}
+				.ovlabel{
+					.opacity(0);
+				}
+				.dvlabel{
+					.opacity(0);
+				}
 			}
 		}
+		.regionlabel{
+			fill: #000;
+			text-anchor:middle;
+			font: 100 15px/19px "Arial";
+			text-transform: uppercase;
+			letter-spacing: 0.07em;
+			.transition(font-size 0.3s);
+			.nopoint();
+		}
 		.olabel{
-			font: 300 10px/14px "Arial";
+			fill: #333;
+			text-anchor:end;
+			font: 300 15px/22px "Arial";
+			.transition(font-size 0.3s;);
+			.nopoint();
+			alignment-baseline: text-after-edge;
 		}
 		.ovlabel{
-			opacity: 0;
+			fill: #333;
+			text-anchor:end;
+			font: 300 16px/14px "Arial";
+			.transition(opacity 0.3s);
+			.nopoint();
+			alignment-baseline:baseline;
+		}
+		.dlabel{
+			fill: #333;
+			font: 300 11px/18px "Arial";
+			.nopoint();
+			alignment-baseline:text-after-edge;
 		}
 		.dvlabel{
-			opacity: 0;
+			fill: #333;
+			font: 300 13px/18px "Arial";
+			text-anchor:end;
+			.transition(opacity 0.3s);
+			.nopoint();
+			alignment-baseline:text-after-edge;
 		}
-	}
 }
-.regionlabel{
-	fill: #000;
-	text-anchor:middle;
-	font: 100 18px/19px "Arial";
-	text-transform: uppercase;
-	letter-spacing: 0.07em;
-	-webkit-transition: font-size 0.3s;
-	.nopoint();
+
+@media screen and (min-width: 769px){
+		.g_node{
+			.transition(opacity 0.3s);
+			&.blurred{
+				.opacity(0.4);
+				&:hover{
+					.opacity(0.8);
+					.olabel{
+						font: 300 13px/17px "Arial";
+					}
+				}
+				.olabel{
+					font: 300 10px/14px "Arial";
+				}
+				.ovlabel{
+					.opacity(0);
+				}
+				.dvlabel{
+					.opacity(0);
+				}
+			}
+		}
+		.regionlabel{
+			fill: #000;
+			text-anchor:middle;
+			font: 100 18px/19px "Arial";
+			text-transform: uppercase;
+			letter-spacing: 0.07em;
+			.transition(font-size 0.3s);
+			.nopoint();
+		}
+		.olabel{
+			fill: #333;
+			text-anchor:end;
+			font: 300 18px/22px "Arial";
+			.transition(font-size 0.3s;);
+			.nopoint();
+			alignment-baseline: text-after-edge;
+		}
+		.ovlabel{
+			fill: #333;
+			text-anchor:end;
+			font: 300 22px/14px "Arial";
+			.transition(opacity 0.3s);
+			.nopoint();
+			alignment-baseline:baseline;
+		}
+		.dlabel{
+			fill: #333;
+			font: 300 13px/18px "Arial";
+			.nopoint();
+			alignment-baseline:text-after-edge;
+		}
+		.dvlabel{
+			fill: #333;
+			font: 300 13px/18px "Arial";
+			text-anchor:end;
+			.transition(opacity 0.3s);
+			.nopoint();
+			alignment-baseline:text-after-edge;
+		}
 }
-.olabel{
-	fill: #333;
-	text-anchor:end;
-	font: 300 18px/22px "Arial";
-	-webkit-transition: font-size 0.3s;
-	.nopoint();
-	alignment-baseline: text-after-edge;
-}
-.ovlabel{
-	fill: #333;
-	text-anchor:end;
-	font: 300 22px/14px "Arial";
-	-webkit-transition: opacity 0.3s;
-	.nopoint();
-	alignment-baseline:baseline;
-}
-.dlabel{
-	fill: #333;
-	font: 300 13px/18px "Arial";
-	.nopoint();
-	alignment-baseline:text-after-edge;
-}
-.dvlabel{
-	fill: #333;
-	font: 300 13px/18px "Arial";
-	text-anchor:end;
-	-webkit-transition: opacity 0.3s;
-	.nopoint();
-	alignment-baseline:text-after-edge;
-}
+
+
 .rline{
 	stroke-width: 2px;
 	stroke: #aaa;
