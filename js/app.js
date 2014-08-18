@@ -1,10 +1,10 @@
 (function(){ "use strict";
 
 	window.faid = function(selector){
-		var sectcat = {"Counter-Terrorism":"Peace and Security","Combating Weapons of Mass Destruction (WMD)":"Peace and Security","Stabilization Operations and Security Sector Reform":"Peace and Security","Counter-Narcotics":"Peace and Security","Transnational Crime":"Peace and Security","Conflict Mitigation and Reconciliation":"Peace and Security","Peace and Security - General":"Peace and Security","Rule of Law and Human Rights":"Democracy, Human Rights, and Governance","Good Governance":"Democracy, Human Rights, and Governance","Political Competition and Consensus-Building":"Democracy, Human Rights, and Governance","Civil Society":"Democracy, Human Rights, and Governance","Democracy, Human Rights, and Governance - General":"Democracy, Human Rights, and Governance","HIV/AIDS":"Health","Tuberculosis":"Health","Malaria":"Health","Pandemic Influenza and Other Emerging Threats (PIOET)":"Health","Other Public Health Threats":"Health","Maternal and Child Health":"Health","Family Planning and Reproductive Health":"Health","Water Supply and Sanitation":"Health","Nutrition":"Health","Health - General":"Health","Basic Education":"Education And Social Services","Higher Education":"Education And Social Services","Policies, Regulations, and Systems":"Education And Social Services","Social Services":"Education And Social Services","Social Assistance":"Education And Social Services","Education and Social Services - General":"Education And Social Services","Macroeconomic Foundation for Growth":"Economic Development","Trade and Investment":"Economic Development","Financial Sector":"Economic Development","Infrastructure":"Economic Development","Agriculture":"Economic Development","Private Sector Competitiveness":"Economic Development","Economic Opportunity":"Economic Development","Labor Policies and Markets":"Economic Development","Manufacturing":"Economic Development","Mining and Natural Resources":"Economic Development","Economic Development - General":"Economic Development","Environment":"Environment","Natural Resources and Biodiversity":"Environment","Clean Productive Environment":"Environment","Environment - General":"Environment","Protection, Assistance and Solutions":"Humanitarian Assistance","Disaster Readiness":"Humanitarian Assistance","Migration Management":"Humanitarian Assistance","Humanitarian Assistance - Generall":"Humanitarian Assistance","Direct Administrative Costs":"Program Management","Monitoring and Evaluation":"Program Management","International Contributions":"Multi-sector","Debt Relief":"Multi-sector"};
+		var sectcat = {"Counter-Terrorism":"Peace and Security","Counterterrorism":"Peace and Security","Combating Weapons of Mass Destruction (WMD)":"Peace and Security","Stabilization Operations and Security Sector Reform":"Peace and Security","Counter-Narcotics":"Peace and Security","Transnational Crime":"Peace and Security","Conflict Mitigation and Reconciliation":"Peace and Security","Peace and Security - General":"Peace and Security","Rule of Law and Human Rights":"Democracy, Human Rights, and Governance","Good Governance":"Democracy, Human Rights, and Governance","Political Competition and Consensus-Building":"Democracy, Human Rights, and Governance","Civil Society":"Democracy, Human Rights, and Governance","Democracy, Human Rights, and Governance - General":"Democracy, Human Rights, and Governance","HIV/AIDS":"Health","Tuberculosis":"Health","Malaria":"Health","Pandemic Influenza and Other Emerging Threats (PIOET)":"Health","Pandemic Influenza and Other Emerging Threats":"Health","Other Public Health Threats":"Health","Maternal and Child Health":"Health","Family Planning and Reproductive Health":"Health","Water Supply and Sanitation":"Health","Nutrition":"Health","Health - General":"Health","Basic Education":"Education And Social Services","Higher Education":"Education And Social Services","Policies, Regulations, and Systems":"Education And Social Services","Social Policies, Regulations, and Systems":"Education And Social Services","Social Services":"Education And Social Services","Social Assistance":"Education And Social Services","Education and Social Services - General":"Education And Social Services","Macroeconomic Foundation for Growth":"Economic Development","Trade and Investment":"Economic Development","Financial Sector":"Economic Development","Infrastructure":"Economic Development","Agriculture":"Economic Development","Private Sector Competitiveness":"Economic Development","Economic Opportunity":"Economic Development","Labor Policies and Markets":"Economic Development","Manufacturing":"Economic Development","Mining and Natural Resources":"Economic Development","Economic Development - General":"Economic Development","Environment":"Environment","Natural Resources and Biodiversity":"Environment","Clean Productive Environment":"Environment","Environment - General":"Environment","Protection, Assistance and Solutions":"Humanitarian Assistance","Disaster Readiness":"Humanitarian Assistance","Migration Management":"Humanitarian Assistance","Humanitarian Assistance - General":"Humanitarian Assistance","Direct Administrative Costs":"Program Management","Monitoring and Evaluation":"Program Management","International Contributions":"Multi-sector","Debt Relief":"Multi-sector","Multi-Sector - Unspecified":"Multi-sector"};
 		var stops = ["Worldwide", "Bureau for Management (USAID)", "Bureau for Policy, Planning and Learning (USAID)", "International Organizations and Development Institutions (US Treasury) - African Development Bank (AfDB)", "International Organizations and Development Institutions (US Treasury) - African Development Fund (AfDF)", "International Organizations and Development Institutions (US Treasury) - Asian Development Bank (AsDB)", "International Organizations and Development Institutions (US Treasury) - Asian Development Fund (AsDF)", "International Organizations and Development Institutions (US Treasury) - Clean Technology Fund (CTF)", "International Organizations and Development Institutions (US Treasury) - European Bank for Reconstruction & Development (EBRD)", "International Organizations and Development Institutions (US Treasury) - Global Agriculture and Food Security Program (GAFSP)", "International Organizations and Development Institutions (US Treasury) - Global Environment Facility (GEF)", "International Organizations and Development Institutions (US Treasury) - Inter-American Development Bank (IDB and FSO)", "International Organizations and Development Institutions (US Treasury) - Inter-American Investment Corporation (IIC)", "International Organizations and Development Institutions (US Treasury) - International Bank for Reconstruction and Development (IBRD)", "International Organizations and Development Institutions (US Treasury) - International Development Association (IDA)", "International Organizations and Development Institutions (US Treasury) - International Fund for Agricultural Development (IFAD)", "International Organizations and Development Institutions (US Treasury) - Multilateral Investment Fund (MIF)", "International Organizations and Development Institutions (US Treasury) - North American Development Bank (NADBank)", "International Organizations and Development Institutions (US Treasury) - Strategic Climate Funds (SCF)", "Office of Innovation and Development Alliances (USAID)", "U.S. Department of the Treasury - Global", "U.S. Department of the Treasury - Office of Technical Assistance - World-Wide Office", "USAID Administrative Costs", "USAID Democracy, Conflict and Humanitarian Assistance", "USAID Economic Growth, Education and Environment", "USAID Global Health", "USAID Inspector General Operating Expense", "USAID Legislative and Public Affairs (LPA)", "USAID Office of Development Partners", "USAID Operating Expense", "USAID Regional Development Mission-Asia", "USAID West Africa Regional"];
 		var recipients_regional = ["Iraq", "Iran", "Joint Europe and Eurasia Regional","State Africa Regional","State Near East Regional/Middle East Partnership Initiative","Argentina","Belize","Bolivia","Brazil","Chile","Colombia","Costa Rica","Dominican Republic","Ecuador","El Salvador","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Paraguay","Peru","Uruguay","Albania","Armenia","Benin","Burkina Faso","Cabo Verde","Georgia","Ghana","Indonesia","Jordan","Lesotho","Liberia","Madagascar","Malawi","Mali","Moldova","Mongolia","Morocco","Mozambique","Namibia","Nepal","Niger","Philippines","Rwanda","Senegal","Tanzania","Tunisia","Zambia","Azerbaijan","Botswana","Bulgaria","Cambodia","Cameroon","Caribbean Region","China","Ethiopia","Fiji","Gambia, The","Guinea","Guyana","Kenya","Kyrgyz Republic","Macedonia","Mauritania","Micronesia","Romania","Samoa","Sierra Leone","South Africa","Suriname","Swaziland","Thailand","Togo","Tonga","Turkmenistan","Uganda","Ukraine","Vanuatu","Africa Region","Burundi","Chad","Djibouti","Nigeria","Somalia","Zimbabwe","Belarus","Central Asia Region","Eurasia Region","Kazakhstan","Montenegro","Russia","Tajikistan","Uzbekistan","Afghanistan","Angola","Asia Region","Bangladesh","Burma","Congo, Democratic Republic of","East Africa Region","East Asia Region","India","Pakistan","Sri Lanka","Sudan, Pre-2011 Election","West Africa Region","Algeria","Central African Republic","Central American Region","Congo, Republic of","Cote d'Ivoire","Eastern European Region","Near East Region","South Africa Region","South Sudan","Sudan","Syrian Arab Republic","Yemen","Bosnia and Herzegovina","Egypt","Serbia","Kosovo","West Bank and Gaza","Comoros","Cuba","Cyprus","Eritrea","Ireland","Israel","Latin America and Caribbean Region","Lebanon","Libya","South Pacific Region","Timor-Leste","Turkey","USAID Middle East Regional","Venezuela","Vietnam","Laos","Papua New Guinea","South America Region","Barbados and Eastern Caribbean","Bhutan","Guinea-Bissau","Hungary","Japan","Korea, North","Korea, South","Maldives","Marshall Islands","New Zealand","Palau","Solomon Islands","South Asia Region","United Arab Emirates","Central Africa Region Program for Environment","Czech Republic","Equatorial Guinea","Gabon","Greece","Mauritius","Sao Tome and Principe","Seychelles","Taiwan","Canada","United Kingdom","Austria","Bahamas, The","Barbadas","Belgium","Croatia","Denmark","Dominica","Estonia","Finland","France","Germany","Grenada","Italy","Latvia","Lithuania","Malaysia","Netherlands","Norway","Oman","Poland","Portugal","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Singapore","Slovak Republic","Slovenia","Spain","Sweden","Switzerland","Trinidad and Tobago","Tuvalu","State Western Hemisphere Regional","Joint Eurasia Regional","USAID Central Asia Regional","Asia Middle East Regional","USAID Africa Regional","USAID Caribbean Regional","USAID Central America Regional","USAID East Africa Regional","USAID Latin America and Caribbean Regional","Food Security (USAID)","USAID Central Africa Regional","USAID South America Regional","USAID Southern Africa Regional","Near East Regional","Office of Afghanistan and Pakistan Affairs (USAID)","Antigua and Barbuda","Iceland","U.S. Department of the Treasury - Latin America and Caribbean","U.S. Department of the Treasury - Vietnam, Cambodia, Asia Regional","Kiribati"];
-		var regioncolor = {"Middle East":{color:""},"Africa":{color:""},"Europe":{color:""},"Central America":{color:""},"South America":{color:""},"Asia":{color:""},"North America":{color:""},"Oceania":{color:""}};
+		var regioncolor = {"Middle East":{color:""},"Africa":{color:""},"Europe":{color:""},"Central America":{color:""},"South America":{color:""},"Asia":{color:""},"North America":{color:""},"Oceania":{color:""},"Worldwide":{color:""},"Internal":{color:""}};
 		var self = window.faid,
 		elmnt = $(selector),
 		hashed = {
@@ -88,15 +88,17 @@
 			self.rectW = self.width*0.06;
 			self.innerbend = self.width*0.02;
 			self.opad = 4; 
+			self.pad = [20, 0];
 		}
+
 		function updateSize(){
 			setSize();
 			self.wst = $(window).scrollTop();
-			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*2.5)]);//-(self.tree_obj.children.length*self.opad)
+			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*6)]);//-(self.tree_obj.children.length*self.opad)
 
 			var scrollsize = self.originScale(self.tree_obj.size)*(6)+(self.opad*self.tree_obj.children.length-1);
+			self.oy = self.height*0.1;
 			self.height = scrollsize;
-			self.oy = self.height*0.04;
 
 			d3.select(selector).style("height", self.height+"px");
 			self.headroom = {top:elmnt.offset().top, bottom:elmnt.outerHeight()}
@@ -118,6 +120,15 @@
 			}
 		}
 
+		function indexOfObject(_a, _key, _val) {
+			for (var i = 0; i < _a.length; i++) {
+				if (_a[i][_key] == _val) {
+					return i;
+				}	
+			}
+			return null;
+		}
+
 		function buildTreeData(input,dex1,dex2){
 			var sandata = { nodes:[], links: [], lookup:{} };
 			var tree_array = d3.nest()
@@ -128,34 +139,46 @@
 			
 			self.tree_obj = {"name":"tree","children":[]};
 			tree_array.forEach(function(d){
-				if(stops.indexOf(d.key)!=-1) return;
+				//if(stops.indexOf(d.key)!=-1) return;
 				var kids = d.values.map(function(child){
 					return {"name":child.key,"size":child.values} 
 				}).sort(function(a,b){return b.size-a.size});
 				self.tree_obj.children.push({"name":d.key,"children":kids});
 			});
 
-			var bins = {};
-			var bintype = (hashed.columns[0]==1)? regions : sectcat;
+			self.bins = {};
+			self.bintype = (hashed.columns[0]==1)? regions : sectcat;
 			self.tree_obj.children.forEach(function(d){
 				//assign the total size of children
 			  	d.size = d.children.reduce(function(a,b){return {size: a.size + b.size};}).size; 
 			  	
 			  	//GROUPSORT: make groups for each category bin
-			  	var bin = bintype[d.name]
-			  	if(bins.hasOwnProperty(bin)){
-			  		bins[bin].children.push(d);
+			  	if(self.bintype==regions){
+			  		var bin = (self.bintype.hasOwnProperty(d.name))? self.bintype[d.name] : "Internal";
+			  	} else {
+			  		var bin = self.bintype[d.name]
+			  	}
+			  	if(self.bins.hasOwnProperty(bin)){
+			  		self.bins[bin].children.push(d);
 			  	}else{
-			  		bins[bin]={children:[d], size:0, name:bin};
+			  		self.bins[bin]={children:[d], size:0, name:bin};
 			  	}
 			});
 			var binarray = [];
-			for(var k in bins){
-				bins[k].size = bins[k].children.reduce(function(a,b){return {size: a.size + b.size};}).size;
-				bins[k].children.sort(function(a,b){return b.size-a.size});
-				binarray.push(bins[k]);
+			for(var k in self.bins){
+				self.bins[k].size = self.bins[k].children.reduce(function(a,b){return {size: a.size + b.size};}).size;
+				self.bins[k].children.sort(function(a,b){return b.size-a.size});
+				binarray.push(self.bins[k]);
 			}
 			binarray.sort(function(a,b){return b.size-a.size});
+			if(self.bintype==regions){
+				var world=indexOfObject(binarray,"name","Worldwide"),
+					intern=indexOfObject(binarray,"name","Internal");
+				// binarray.splice(world,1);
+				// binarray.splice(intern,1);
+				if(world!=null)binarray.push(binarray.splice(world,1)[0])
+				if(intern!=null)binarray.push(binarray.splice(intern,1)[0])
+			}
 			self.tree_obj.children  = binarray.reduce(function(a, b){return {children: a.children.concat(b.children)} }).children;
 
 			self.tree_obj["size"] = self.tree_obj.children.reduce(function(a,b){return {size: a.size + b.size};}).size; 
@@ -163,7 +186,6 @@
 			//this sort is only needed if group sorting is not used
 			//self.tree_obj.children.sort(function(a,b){return b.size-a.size})
 			
-			log(self.tree_obj);
 			self.originScale = d3.scale.linear().domain([0, self.tree_obj.size]).range([2, (self.height*1.5)]);//-(self.tree_obj.children.length*self.opad)
 			updateSize();
 
@@ -171,7 +193,6 @@
 
 			renderLayout(self.tree_obj);
 		}
-
 
 		function sortKey(array,key){
 			array.sort(function(a,b){return b[key[0]][key[1]]-a[key[0]][key[1]]});
@@ -193,11 +214,6 @@
 				.y1(function(d) { return d.y1; })
 				.y0(function(d) { return d.y0 })
 				.interpolate('monotone');
-
-			// var color = d3.scale.linear()
-			//     .domain([-1, 5])
-			//     .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
-			//     .interpolate(d3.interpolateHcl);
 
 			self.svg = d3.select("#viz").append("svg")
 			    .attr("width", self.width)
@@ -225,18 +241,42 @@
 					focusViz(d.name);
 					scrollToNode(d,i);
 				});
+			var regionlab = "";
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
 				.attr("x",0)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
-				.text(function(d){return d.name});
+				.text(function(d){
+					if(self.bintype==regions){
+						var bin = (self.bintype.hasOwnProperty(d.name))? self.bintype[d.name] : "Internal";
+					} else {
+						var bin = self.bintype[d.name]
+					}
+					if(bin!=regionlab){
+						regionlab = bin;
+						var parent = d3.select(this)[0][0].parentElement;
+						d3.select(parent).append("text")
+							.attr("class", "regionlabel")
+							.attr("x",0)
+							.attr("y",20)
+							.attr("transform", "translate("+(self.ox*-0.7)+",0) rotate(90)")
+							.append('svg:tspan')
+							.attr('x', 0)//(self.ox*-0.9)
+							.attr('dy', 5)
+							.text(regionlab)
+							.append('svg:tspan')
+							.attr('x', 0)
+							.attr('dy', 24)
+							.text(valueClean(self.bins[regionlab].size,1))
+					}
+					return d.name
+				});
 			self.ovlabels = self.gees.append("text")
 				.attr("class", "ovlabel")
 				.attr("x",4)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
 				.text(function(d){return valueClean(d.size,1) });
 
-			self.pad = [20, 0];
 			self.focusGroup = {
 				value:[],
 				varea:[],
@@ -294,7 +334,7 @@
 			var origin = self.originScale(d.stack)+((i)*self.opad);
 			var yoff = self.headroom.top+origin;//+self.oy;
 			var strch = self.stretch(origin);//faid.scrollScale.invert( self.stretch(origin) )
-			var centered = (yoff-self.winHalf)+(origin*0.0001);//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
+			var centered = (yoff-self.winHalf)+(origin*0.0001)+self.oy;//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
 			// console.log("origin = "+origin);
 			// console.log("self.stretch = "+ self.stretch(origin));
 			// console.log("centered = "+centered);
@@ -312,7 +352,7 @@
 
 		function positionStacks(wst){
 			self.gees.attr("transform", function(d,i){
-				var yoffset = self.originScale(d.stack)+(i*self.opad);//+self.scrollScale(wst);
+				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.oy;//+self.scrollScale(wst);
 				d.yoffset = yoffset;
 				blurTest(i,d.name);
 				return "translate("+self.ox+","+yoffset+")";
