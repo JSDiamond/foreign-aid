@@ -9,7 +9,7 @@
 		elmnt = $(selector),
 		hashed = {
 			years:["2009","2010","2011","2012","2013"],
-			columns:["1","2"],
+			columns:[1,2],
 			focus: null,
 			hash: window.location.hash.substr(1).split("/")
 		};
@@ -34,7 +34,6 @@
 
 			setSize();
 			getData(hashed.columns);
-			//$(window).scrollTop(0, 0);
 			$(window).on('hashchange', function() {
 				updateHash();
 				if(self.columns[0]!=hashed.columns[0] || self.year!=hashed.year){
@@ -51,11 +50,10 @@
 		function updateHash(){
 			hashed.hash = window.location.hash.substr(1).split("/");
 			hashed.year = ( hashed.years.indexOf(hashed.hash[0])!=-1 )? hashed.hash[0] : "2013";
-			// hashed.d1 = ( hashed.columns.indexOf(hashed.hash[1])!=-1 )? hashed.hash[1] : "2";
-			// hashed.d2 = ( hashed.columns.indexOf(hashed.hash[2])!=-1 )? (hashed.hash[2]==hashed.d1)? "1" : hashed.hash[2] : "1";
-			//hashed.columns = (hashed.columns[0]==1)? [2,1] : [1,2];
-			hashed.columns = ( hashed.hash[1]==1 || hashed.columns.indexOf(hashed.hash[1])==-1 )? [1,2] : [2,1];
+			hashed.columns = ( hashed.hash[1]==1 || hashed.columns.indexOf( parseInt(hashed.hash[1]) )==-1 )? [1,2] : [2,1];
 			hashed.focus = decodeURIComponent(hashed.hash[3]) || "";
+			var bt = (hashed.columns[0]==1)? "region" : "sector";
+			$("#faid_bintype").text(bt);
 		}
 
 		function hashChanged(){
@@ -183,6 +181,8 @@
 			self.tree_obj.children  = self.binarray.reduce(function(a, b){return {children: a.children.concat(b.children)} }).children;
 
 			self.tree_obj["size"] = self.tree_obj.children.reduce(function(a,b){return {size: a.size + b.size};}).size; 
+
+			$("#faid_amount").text( valueClean(self.tree_obj.size,1) );
 			
 			//this sort is only needed if group sorting is not used
 			//self.tree_obj.children.sort(function(a,b){return b.size-a.size})
@@ -203,7 +203,7 @@
 		function renderLayout(root){
 			self.startScale = d3.scale.linear().domain([0, 100]).range([0, 8]);
 			self.endScale = d3.scale.linear().domain([0, 100]).range([2, 100]);
-			self.paralaxScale = d3.scale.linear().domain([0, 100]).range([0, 100]);
+			self.parallaxScale = d3.scale.linear().domain([0, 100]).range([0, 100]);
 			var line = d3.svg.line()
 				.defined(function(d) { return String(d.y) != 'NaN'; })
 				.x(function(d) {return d.x;})
@@ -243,6 +243,7 @@
 					scrollToNode(d,i);
 				});
 			var regionlab = "";
+			self.line = d3.svg.line().x(function(d){return d.x;}).y(function(d){return d.y;});
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
 				.attr("x",-4)
@@ -256,7 +257,7 @@
 							.attr("class", "regionlabel")
 							.attr("x",0)
 							.attr("y",20)
-							.attr("transform", "translate("+(self.ox*-0.8)+",-40)")//rotate(90)
+							.attr("transform", "translate("+( (self.width-self.dx-self.rectW)*0.5 )+",-42)")//rotate(90)//(self.ox*-0.8)
 							.append('svg:tspan')
 							.attr('x', 0)//(self.ox*-0.9)
 							.attr('dy', 5)
@@ -265,6 +266,10 @@
 							// .attr('x', 0)
 							// .attr('dy', 20)
 							// .text(valueClean(self.bins[regionlab].size,1))
+						d3.select(parent).append('path')
+							.datum([{x:(self.ox)*-0.8,y:-10},{x:self.width*0.575,y:-10}])
+							.attr("d", self.line)
+							.attr("class", "rline");
 					}
 					return d.name
 				});
@@ -281,7 +286,7 @@
 				dgs:[],
 				gs:[],
 				gn:[],
-				main: 0
+				main: null
 			}
 
 			positionStacks(self.headroom.top);
@@ -333,7 +338,6 @@
 			var yoff = self.headroom.top+origin;//+self.oy;
 			var strch = self.stretch(origin);//faid.scrollScale.invert( self.stretch(origin) )
 			var region = (indexOfObject(self.binarray, "name", self.bintype[d.name])+1)*60;
-			log(region)
 			var centered = (yoff-self.winHalf)+(origin*0.0001)+self.oy+region;//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
 			// console.log("origin = "+origin);
 			// console.log("self.stretch = "+ self.stretch(origin));
@@ -366,23 +370,31 @@
 			self.focusGroup.value.forEach(function(d,i){
 				var bcr = d3.select(self.focusGroup.gs[i]).select(".orect")[0][0].getBoundingClientRect();
 				var vH = vareaDimens(d,self.pad,0,0)[0].height;
-				self.paralaxScale.domain([0,bcr.height]).range([0,vH]);
-				var newData = vareaStack(d,self.pad,0, self.paralaxScale(self.winHalf-bcr.top)*-1 ); //(wst*-0.4+(yoff*10))
+				self.parallaxScale.domain([0,bcr.height]).range([0,vH]);
+				var newData = vareaStack(d,self.pad,0, self.parallaxScale(self.winHalf-bcr.top)*-1 ); //(wst*-0.4+(yoff*10))
 				self.focusGroup.varea[i].data(newData.links).attr("d", self.area);
 				self.focusGroup.dgs[i].data(newData.drects).attr("transform", function(d,i){
 					return "translate("+d.x+","+d.y1+")";
 				});
 			});
 
+			if(self.wst < self.headroom.top && self.focusGroup.main!=0){
+					 self.focusGroup.main=0;
+			}
+
 			self.gees[0].forEach(function(d,i){
 				var bcr = d3.select(self.gees[0][i]).select(".orect")[0][0].getBoundingClientRect();
-				if(bcr.top-self.opad*0.5 <= self.winHalf && (bcr.top+bcr.height+self.opad*0.5) >= self.winHalf){
+				if(self.focusGroup.main==0 && self.focusGroup.main==i && self.focusGroup.gn.indexOf(i)==-1){
+					bindVarea(i);
+				} else if(bcr.top-self.opad*0.5 <= self.winHalf && (bcr.top+bcr.height+self.opad*0.5) >= self.winHalf){
 					if(self.focusGroup.gn.indexOf(i)==-1) bindVarea(i); self.focusGroup.main=i;
 					// if(self.focusGroup.gn.indexOf(i-1)==-1 && self.gees[0][i-1]) bindVarea(i-1);
 					// if(self.focusGroup.gn.indexOf(i+1)==-1 && self.gees[0][i+1]) bindVarea(i+1);
 				} else {
-					if(i==self.focusGroup.gn[0]){removeVarea(i);}
+					if(self.wst < self.headroom.top+self.oy*0.15 && i==0){
+					}else if(i==self.focusGroup.gn[0]){removeVarea(i);}
 				}
+
 			});
 		}
 

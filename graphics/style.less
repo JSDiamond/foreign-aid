@@ -5,12 +5,22 @@
 	pointer-events:none;
 }
 
+.dek{
+	padding-top: 10px;
+	padding-bottom: 4px;
+	padding-right: 6%;
+	padding-left: 6%;
+	font: 300 20px/24px 'Arial';
+	text-align: center;
+}
 
 #viz{
 	background-color: #fff;
 	position: relative;
 	min-height: 300px;
 	width:100%;
+	font-family: Arial;
+	
 }
 .banner{
 	width: 100%;
@@ -49,8 +59,8 @@
 }
 .regionlabel{
 	fill: #000;
-	text-anchor:start;
-	font: 100 24px/19px "Arial";
+	text-anchor:middle;
+	font: 100 18px/19px "Arial";
 	text-transform: uppercase;
 	letter-spacing: 0.07em;
 	-webkit-transition: font-size 0.3s;
@@ -85,4 +95,8 @@
 	-webkit-transition: opacity 0.3s;
 	.nopoint();
 	alignment-baseline:text-after-edge;
+}
+.rline{
+	stroke-width: 2px;
+	stroke: #aaa;
 }
