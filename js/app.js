@@ -9,7 +9,7 @@
 		elmnt = $(selector),
 		hashed = {
 			years:["2009","2010","2011","2012","2013"],
-			columns:["0","1","2"],
+			columns:["1","2"],
 			focus: null,
 			hash: window.location.hash.substr(1).split("/")
 		};
@@ -50,11 +50,11 @@
 
 		function updateHash(){
 			hashed.hash = window.location.hash.substr(1).split("/");
-			hashed.year = ( hashed.years.indexOf(hashed.hash[0])!=-1 )? hashed.hash[0] : "2009";
+			hashed.year = ( hashed.years.indexOf(hashed.hash[0])!=-1 )? hashed.hash[0] : "2013";
 			// hashed.d1 = ( hashed.columns.indexOf(hashed.hash[1])!=-1 )? hashed.hash[1] : "2";
 			// hashed.d2 = ( hashed.columns.indexOf(hashed.hash[2])!=-1 )? (hashed.hash[2]==hashed.d1)? "1" : hashed.hash[2] : "1";
 			//hashed.columns = (hashed.columns[0]==1)? [2,1] : [1,2];
-			hashed.columns = ( hashed.hash[1]==1 )? [1,2] : [2,1];
+			hashed.columns = ( hashed.hash[1]==1 || hashed.columns.indexOf(hashed.hash[1])==-1 )? [1,2] : [2,1];
 			hashed.focus = decodeURIComponent(hashed.hash[3]) || "";
 		}
 
@@ -79,15 +79,15 @@
 			// x = w.innerWidth || e.clientWidth || g.clientWidth;
 			// y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 			self.margin = 2; self.wst = $(window).scrollTop();
-			self.width = $(window).width();
+			self.width = $(selector).width();
 			self.height = $(window).height();
 			//self.winSpan = [self.height*0.4, self.height-self.height*0.4];
 			self.winHalf = self.height*0.5;
 			self.ox = self.width*0.35;
 			self.dx = self.width*0.7;
-			self.rectW = self.width*0.06;
+			self.rectW = self.width*0.04;
 			self.innerbend = self.width*0.02;
-			self.opad = 4; 
+			self.opad = 10; 
 			self.pad = [20, 0];
 		}
 
@@ -96,7 +96,7 @@
 			self.wst = $(window).scrollTop();
 			self.originScale.domain([0, self.tree_obj.size]).range([2, (self.height*6)]);//-(self.tree_obj.children.length*self.opad)
 
-			var scrollsize = self.originScale(self.tree_obj.size)*(6)+(self.opad*self.tree_obj.children.length-1);
+			var scrollsize = self.originScale(self.tree_obj.size)*(1.25)+(self.opad*self.tree_obj.children.length-1);
 			self.oy = self.height*0.1;
 			self.height = scrollsize;
 
@@ -155,6 +155,7 @@
 			  	//GROUPSORT: make groups for each category bin
 			  	if(self.bintype==regions){
 			  		var bin = (self.bintype.hasOwnProperty(d.name))? self.bintype[d.name] : "Internal";
+			  		if(bin=="Internal") self.bintype[d.name] = "Internal";
 			  	} else {
 			  		var bin = self.bintype[d.name]
 			  	}
@@ -164,22 +165,22 @@
 			  		self.bins[bin]={children:[d], size:0, name:bin};
 			  	}
 			});
-			var binarray = [];
+			self.binarray = [];
 			for(var k in self.bins){
 				self.bins[k].size = self.bins[k].children.reduce(function(a,b){return {size: a.size + b.size};}).size;
 				self.bins[k].children.sort(function(a,b){return b.size-a.size});
-				binarray.push(self.bins[k]);
+				self.binarray.push(self.bins[k]);
 			}
-			binarray.sort(function(a,b){return b.size-a.size});
+			self.binarray.sort(function(a,b){return b.size-a.size});
 			if(self.bintype==regions){
-				var world=indexOfObject(binarray,"name","Worldwide"),
-					intern=indexOfObject(binarray,"name","Internal");
-				// binarray.splice(world,1);
-				// binarray.splice(intern,1);
-				if(world!=null)binarray.push(binarray.splice(world,1)[0])
-				if(intern!=null)binarray.push(binarray.splice(intern,1)[0])
+				var world=indexOfObject(self.binarray,"name","Worldwide"),
+					intern=indexOfObject(self.binarray,"name","Internal");
+				// self.binarray.splice(world,1);
+				// self.binarray.splice(intern,1);
+				if(world!=null)self.binarray.push(self.binarray.splice(world,1)[0])
+				if(intern!=null)self.binarray.push(self.binarray.splice(intern,1)[0])
 			}
-			self.tree_obj.children  = binarray.reduce(function(a, b){return {children: a.children.concat(b.children)} }).children;
+			self.tree_obj.children  = self.binarray.reduce(function(a, b){return {children: a.children.concat(b.children)} }).children;
 
 			self.tree_obj["size"] = self.tree_obj.children.reduce(function(a,b){return {size: a.size + b.size};}).size; 
 			
@@ -244,14 +245,10 @@
 			var regionlab = "";
 			self.olabels = self.gees.append("text")
 				.attr("class", "olabel")
-				.attr("x",0)
+				.attr("x",-4)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
 				.text(function(d){
-					if(self.bintype==regions){
-						var bin = (self.bintype.hasOwnProperty(d.name))? self.bintype[d.name] : "Internal";
-					} else {
-						var bin = self.bintype[d.name]
-					}
+					var bin = self.bintype[d.name];
 					if(bin!=regionlab){
 						regionlab = bin;
 						var parent = d3.select(this)[0][0].parentElement;
@@ -259,22 +256,23 @@
 							.attr("class", "regionlabel")
 							.attr("x",0)
 							.attr("y",20)
-							.attr("transform", "translate("+(self.ox*-0.7)+",0) rotate(90)")
+							.attr("transform", "translate("+(self.ox*-0.8)+",-40)")//rotate(90)
 							.append('svg:tspan')
 							.attr('x', 0)//(self.ox*-0.9)
 							.attr('dy', 5)
-							.text(regionlab)
-							.append('svg:tspan')
-							.attr('x', 0)
-							.attr('dy', 24)
-							.text(valueClean(self.bins[regionlab].size,1))
+							.text(regionlab+" : "+valueClean(self.bins[regionlab].size,1))
+							// .append('svg:tspan')
+							// .attr('x', 0)
+							// .attr('dy', 20)
+							// .text(valueClean(self.bins[regionlab].size,1))
 					}
 					return d.name
 				});
 			self.ovlabels = self.gees.append("text")
 				.attr("class", "ovlabel")
-				.attr("x",4)
+				.attr("x",-4)
 				.attr("y",function(d){return self.originScale(d.size)*0.5;})
+				.attr("dy", -22)
 				.text(function(d){return valueClean(d.size,1) });
 
 			self.focusGroup = {
@@ -334,7 +332,9 @@
 			var origin = self.originScale(d.stack)+((i)*self.opad);
 			var yoff = self.headroom.top+origin;//+self.oy;
 			var strch = self.stretch(origin);//faid.scrollScale.invert( self.stretch(origin) )
-			var centered = (yoff-self.winHalf)+(origin*0.0001)+self.oy;//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
+			var region = (indexOfObject(self.binarray, "name", self.bintype[d.name])+1)*60;
+			log(region)
+			var centered = (yoff-self.winHalf)+(origin*0.0001)+self.oy+region;//-19+(origin*0.005));//(yoff-self.winHalf+(i*0.01));
 			// console.log("origin = "+origin);
 			// console.log("self.stretch = "+ self.stretch(origin));
 			// console.log("centered = "+centered);
@@ -351,9 +351,14 @@
 		}
 
 		function positionStacks(wst){
+			var region = {name:"", height:0};
 			self.gees.attr("transform", function(d,i){
-				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.oy;//+self.scrollScale(wst);
+				var bin = self.bintype[d.name];
+				var sectioned = (bin!=region.name)? 60 : 0;
+				region.height += sectioned;
+				var yoffset = self.originScale(d.stack)+(i*self.opad)+self.oy+region.height;//+self.scrollScale(wst);
 				d.yoffset = yoffset;
+				region.name = bin;
 				blurTest(i,d.name);
 				return "translate("+self.ox+","+yoffset+")";
 			});
@@ -410,12 +415,12 @@
 				.attr("fill", function(d){ return d.clr });//url(#linkgrad)
 			self.dgs.append("text")
 				.attr("class", 'dlabel')
-				.attr("x", self.rectW)
+				.attr("x", self.rectW+4)
 				.attr("y", function(d){return d.y0*0.5})
 				.text(function(d){return d.name});
 			self.dgs.append("text")
 				.attr("class", "dlabel dvlabel")
-				.attr("x",self.rectW-4)
+				.attr("x",-4)
 				.attr("y",function(d){return d.y0*0.5})
 				.text(function(d){return valueClean(d.size,1)});		
 
@@ -435,7 +440,7 @@
 			} else if(val*0.001 > 1){//if(val*0.001 > 0)
 				return "$"+(val*0.001).toFixed(decimal)+"K";
 			} else {
-				return "$"+(val);	
+				return "$"+(val).toFixed(decimal);	
 			}
 		}
 

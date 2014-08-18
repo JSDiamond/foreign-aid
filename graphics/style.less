@@ -6,10 +6,11 @@
 }
 
 
-
 #viz{
 	background-color: #fff;
 	position: relative;
+	min-height: 300px;
+	width:100%;
 }
 .banner{
 	width: 100%;
@@ -24,9 +25,6 @@
 }
 .varea{
 	fill-opacity: 0.4;
-	&:hover{
-		fill-opacity: 1;	
-	}
 }
 .g_node{
 	-webkit-transition: opacity 0.3s;
@@ -35,7 +33,7 @@
 		&:hover{
 			opacity: 0.8;
 			.olabel{
-				font: 300 15px/19px "Arial";
+				font: 300 13px/17px "Arial";
 			}
 		}
 		.olabel{
@@ -52,33 +50,39 @@
 .regionlabel{
 	fill: #000;
 	text-anchor:start;
-	font: 500 18px/24px "Arial";
+	font: 100 24px/19px "Arial";
 	text-transform: uppercase;
+	letter-spacing: 0.07em;
 	-webkit-transition: font-size 0.3s;
-	.nopoint()
+	.nopoint();
 }
 .olabel{
 	fill: #333;
 	text-anchor:end;
 	font: 300 18px/22px "Arial";
 	-webkit-transition: font-size 0.3s;
-	.nopoint()
+	.nopoint();
+	alignment-baseline: text-after-edge;
 }
 .ovlabel{
 	fill: #333;
-	font: 300 10px/14px "Arial";
+	text-anchor:end;
+	font: 300 22px/14px "Arial";
 	-webkit-transition: opacity 0.3s;
-	.nopoint()
+	.nopoint();
+	alignment-baseline:baseline;
 }
 .dlabel{
 	fill: #333;
 	font: 300 13px/18px "Arial";
-	.nopoint()
+	.nopoint();
+	alignment-baseline:text-after-edge;
 }
 .dvlabel{
 	fill: #333;
 	font: 300 13px/18px "Arial";
 	text-anchor:end;
 	-webkit-transition: opacity 0.3s;
-	.nopoint()
+	.nopoint();
+	alignment-baseline:text-after-edge;
 }
