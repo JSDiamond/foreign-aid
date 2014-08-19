@@ -5,16 +5,23 @@
 		<meta charset="utf-8">
 		<title>project</title>
 
+		<link rel="stylesheet" href="graphics/bootstrap.min.css">
 		<link rel="stylesheet" href="graphics/style.css">
-
+		
 		<script type="text/javascript" src="js/vendor/jquery-1.11.1.min.js"></script>
 		<script type="text/javascript" src="js/vendor/d3-3.4.11.min.js"></script>
+		<script type="text/javascript" src="js/vendor/bootstrap.min.js"></script>
 
 	</head>
 	<body>
 		<div id="header" class="banner"></div>
-		<div id="viz"></div>
-		<!-- <div id="scrollspace"></div> -->
+		<div class="data-viz">
+			<div class="dek">The U.S. spent <span id="faid_amount">$</span> on foreign aid in <div class="dropdown"><button id="year_button" class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"><span class="fyear">2013</span><span class="caret"></span></button><ul id="year_list" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1"><li role="presentation"><a role="menuitem" tabindex="-1">2013</a></li><li role="presentation"><a role="menuitem" tabindex="-1">2012</a></li><li role="presentation"><a role="menuitem" tabindex="-1">2011</a></li><li role="presentation"><a role="menuitem" tabindex="-1">2010</a></li><li role="presentation"><a role="menuitem" tabindex="-1">2009</a></li></ul></div></div><p class="dek">Here's a simple breakdown by <span id="faid_bintype"></span>.</p>
+			<div id="viz"></div>
+			<p class="vsource"> 
+				Source: All data provided by <a href="http://www.foreignassistance.gov/web/DataView.aspx" target="_blank">foreignassistance.gov</a>. All sectors are defined <a href="http://www.foreignassistance.gov/web/Documents/SPSD.pdf" target="_blank">here</a>. 
+			</p>
+		</div>
 		<div id="footer" class="banner"></div>
 		
 		<script src="js/data/categories.js"></script>
@@ -22,6 +29,7 @@
 		<script src="js/data/regions.js"></script>
 		<script src="js/app.js"></script>
 		<script type="text/javascript">
+			//http://ideasneversleep.is/wp-content/uploads/2014/08/aid_2013.js
 			$(document).ready(function(){
 				var app = faid('#viz');
 			});
